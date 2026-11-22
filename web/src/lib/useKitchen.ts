@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { wsUrl } from './api'
+import { MOCK, mockConnect } from './mock'
 import type { Dish, KitchenEvent, KitchenState, Pantry, ServerInfo } from './types'
 
 type Listener = (e: KitchenEvent) => void
@@ -15,6 +16,21 @@ export function useKitchen() {
   const listeners = useRef(new Set<Listener>())
 
   useEffect(() => {
+    const handle = (msg: any) => {
+      switch (msg.type) {
+        case 'hello':
+          setInfo(msg.info); setDishes(msg.dishes); setPantry(msg.pantry); setEvents(msg.events); setConnected(true)
+          break
+        case 'state':
+          setState(msg)
+          break
+        case 'event':
+          setEvents((prev) => [...prev.slice(-119), msg.event])
+          listeners.current.forEach((fn) => fn(msg.event))
+          break
+      }
+    }
+    if (MOCK) return mockConnect(handle)
     let ws: WebSocket | null = null
     let retry: ReturnType<typeof setTimeout> | undefined
     let ping: ReturnType<typeof setInterval> | undefined

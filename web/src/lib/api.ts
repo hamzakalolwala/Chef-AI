@@ -1,3 +1,4 @@
+import { MOCK, mockSend } from './mock'
 import type { HistoryRow, Pantry, Profile, VideoRecipe, Zone } from './types'
 
 // Same origin by default (Vite proxies /api and /ws in dev; the backend serves the build in prod).
@@ -14,6 +15,7 @@ export const wsUrl = (path: string) => {
 }
 
 async function send<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (MOCK) return mockSend(method, path, body) as Promise<T>
   const res = await fetch(apiUrl(path), {
     method,
     headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },

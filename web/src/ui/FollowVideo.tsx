@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import { MOCK } from '../lib/mock'
 import type { Burner, FollowState, Pantry, VideoItem, VideoRecipe } from '../lib/types'
 import { Modal } from './Modals'
 
@@ -84,7 +85,7 @@ export function FollowVideo({ pantry, burners, onClose }: { pantry: Pantry; burn
         <div className="recent">
           {recent.slice(0, 8).map((r) => (
             <button key={r.id} className="recent-item" onClick={() => api.video(r.id).then(load)}>
-              {r.thumbnail && <img src={r.thumbnail} alt="" />}
+              {r.thumbnail && !MOCK && <img src={r.thumbnail} alt="" />}
               <span>{r.title}</span>
             </button>
           ))}
@@ -94,14 +95,16 @@ export function FollowVideo({ pantry, burners, onClose }: { pantry: Pantry; burn
       {recipe && (
         <div className="follow">
           <div className="follow-left">
-            <iframe
+            {MOCK ? (
+              <a className="yt yt-link" href={`${recipe.url}${start ? `&t=${Math.floor(start)}s` : ''}`} target="_blank" rel="noreferrer">▶ Watch on YouTube{start ? ` from ${mmss(start)}` : ''}</a>
+            ) : <iframe
               key={start}
               className="yt"
               src={`https://www.youtube-nocookie.com/embed/${recipe.id}?start=${Math.floor(start)}${start ? '&autoplay=1' : ''}`}
               title={recipe.title}
               allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
-            />
+            />}
             <b>{recipe.title}</b>
             <span className="hint">
               {recipe.channel} · amounts from {recipe.caption_source ? 'description + captions' : 'description only (no usable captions)'}

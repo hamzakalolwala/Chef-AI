@@ -23,3 +23,4 @@ backend/data/eval/
 .claude/
 *.log
 *.tsbuildinfo
+dist-preview/

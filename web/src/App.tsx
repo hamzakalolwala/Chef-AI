@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, apiUrl } from './lib/api'
 import type { KitchenEvent } from './lib/types'
+import { MOCK } from './lib/mock'
 import { useKitchen } from './lib/useKitchen'
 import { announce, chime } from './lib/voice'
 import { Kitchen } from './scene/Kitchen'
@@ -91,7 +92,7 @@ export default function App() {
           <span className={`pill ${clf?.loading ? 'warn' : clf?.name.startsWith('clip') ? 'ok' : ''}`} title="Dish recognition model">
             🧠 {clf?.loading ? 'loading model…' : clf?.name.startsWith('clip') ? 'CLIP' : 'no dish model'}
           </span>
-          {state?.demo && <span className="pill demo">DEMO</span>}
+          {state?.demo && <span className="pill demo">{MOCK ? 'PREVIEW' : 'DEMO'}</span>}
         </div>
         <nav className="actions-top">
           <ProfileSwitcher pantry={pantry} activeId={state?.profile?.id} onEdit={() => setPanel('profiles')} />

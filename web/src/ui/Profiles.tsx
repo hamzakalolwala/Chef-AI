@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api, apiUrl } from '../lib/api'
+import { MOCK } from '../lib/mock'
 import type { Pantry, Profile } from '../lib/types'
 import { Modal } from './Modals'
 
@@ -124,7 +125,7 @@ export function LabelsSheet({ pantry, onClose }: { pantry: Pantry; onClose: () =
       <div className="print-sheet">
         {items.map((it) => (
           <div className="sticker" key={it.key} style={{ ['--c' as string]: it.color }}>
-            <img src={apiUrl(`/api/markers/${it.marker}.png`)} alt={`Marker ${it.marker} for ${it.name}`} />
+            {MOCK ? <div className="marker-ph">#{it.marker}</div> : <img src={apiUrl(`/api/markers/${it.marker}.png`)} alt={`Marker ${it.marker} for ${it.name}`} />}
             <div>
               <b>{it.name}</b>
               <span>{it.sub} · #{it.marker}</span>

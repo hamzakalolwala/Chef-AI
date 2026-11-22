@@ -126,6 +126,10 @@ function CameraRig({ burners, selected }: { burners: Burner[]; selected: string 
       const { x, z } = layout(b.zone)
       c.setLookAt(x * 0.6, 4.6, z + 5.4, x, 0.4, z, true)
       c.setFocalOffset(offset * 0.9, 0, 0, true)
+    } else if (window.innerWidth < 600) {
+      // phone: cards cover the bottom half, so look from higher up and push the stove toward the top
+      c.setLookAt(0, 15, 9.5, 0, 0, 0.6, true)
+      c.setFocalOffset(0, 1.7, 0, true)
     } else {
       c.setLookAt(0, 7.4, 9.2, 0, 0, 0.3, true)
       c.setFocalOffset(offset * 1.7, 0.3, 0, true)

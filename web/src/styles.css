@@ -264,3 +264,19 @@ table.history { width: 100%; border-collapse: collapse; font-size: 13px; }
 .actions-top .btn { padding: 6px 10px; font-size: 12.5px; }
 .profile-switch select { max-width: 150px; }
 @media (max-width: 1500px) { .brand p { display: none; } .pills .pill { padding: 3px 8px; } }
+
+.yt-link { display: grid; place-items: center; color: var(--text); text-decoration: none; font-weight: 600; background: linear-gradient(135deg, #2a0d0d, #111); }
+.marker-ph { width: 110px; height: 110px; display: grid; place-items: center; background: repeating-conic-gradient(#111 0 25%, #fff 0 50%) 0 0 / 22px 22px; color: #e33; font-weight: 700; border: 8px solid #fff; }
+
+/* phones: keep the top bar to one scrollable row so the 3D stove stays visible */
+@media (max-width: 600px) {
+  .topbar { top: 8px; left: 8px; right: 8px; padding: 8px 10px; gap: 8px; }
+  .pills { display: none; }
+  .actions-top { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; }
+  .actions-top > * { flex: 0 0 auto; }
+  .sidebar { left: 8px; right: 8px; bottom: 8px; height: 44%; }
+  .toasts { top: 120px; width: calc(100% - 24px); }
+  .toast { font-size: 13px; }
+  .empty { width: calc(100% - 32px); }
+  .labels { display: none; }   /* the burner cards carry the same timers on a phone */
+}
