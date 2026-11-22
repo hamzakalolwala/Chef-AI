@@ -1,0 +1,4 @@
+# Dish recognition (OpenCLIP zero-shot + learn-from-corrections). ~600 MB model download on first run.
+-r requirements.txt
+torch>=2.5
+open_clip_torch>=2.26

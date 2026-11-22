@@ -1,0 +1,556 @@
+{
+  "_comment": "density = grams per ml (level spoon). marker = printed ArUco id (DICT_4X4_50). aliases = names/Hindi words the video-recipe reader matches. Recipes are grams for one standard batch (~4 servings); edit freely.",
+  "ingredients": [
+    {
+      "id": "salt",
+      "name": "Salt",
+      "density": 1.2,
+      "marker": 1,
+      "color": "#e8eef5",
+      "aliases": [
+        "salt",
+        "namak",
+        "sea salt",
+        "kosher salt",
+        "rock salt",
+        "sendha namak",
+        "black salt",
+        "kala namak",
+        "table salt"
+      ]
+    },
+    {
+      "id": "sugar",
+      "name": "Sugar",
+      "density": 0.85,
+      "marker": 2,
+      "color": "#fbf7ee",
+      "aliases": [
+        "sugar",
+        "white sugar",
+        "granulated sugar",
+        "caster sugar",
+        "cheeni",
+        "chini",
+        "shakkar",
+        "powdered sugar",
+        "icing sugar"
+      ]
+    },
+    {
+      "id": "turmeric",
+      "name": "Turmeric",
+      "density": 0.55,
+      "marker": 3,
+      "color": "#f2b705",
+      "aliases": [
+        "turmeric",
+        "turmeric powder",
+        "haldi",
+        "haldi powder"
+      ]
+    },
+    {
+      "id": "chili",
+      "name": "Red chili",
+      "density": 0.45,
+      "marker": 4,
+      "color": "#c0261f",
+      "aliases": [
+        "red chili powder",
+        "red chilli powder",
+        "chilli powder",
+        "chili powder",
+        "kashmiri chilli powder",
+        "kashmiri chili powder",
+        "kashmiri red chilli powder",
+        "lal mirch",
+        "lal mirch powder",
+        "mirchi powder",
+        "cayenne",
+        "paprika",
+        "red chilli flakes",
+        "chili flakes"
+      ]
+    },
+    {
+      "id": "coriander_powder",
+      "name": "Coriander powder",
+      "density": 0.4,
+      "marker": 5,
+      "color": "#a68a4b",
+      "aliases": [
+        "coriander powder",
+        "dhaniya powder",
+        "dhania powder",
+        "ground coriander"
+      ]
+    },
+    {
+      "id": "garam_masala",
+      "name": "Garam masala",
+      "density": 0.45,
+      "marker": 6,
+      "color": "#7a4a2a",
+      "aliases": [
+        "garam masala"
+      ]
+    },
+    {
+      "id": "cumin",
+      "name": "Jeera",
+      "density": 0.42,
+      "marker": 7,
+      "color": "#8a6d3b",
+      "aliases": [
+        "cumin seeds",
+        "cumin",
+        "jeera",
+        "zeera",
+        "cumin powder",
+        "jeera powder"
+      ]
+    },
+    {
+      "id": "oil",
+      "name": "Oil",
+      "density": 0.92,
+      "marker": 8,
+      "color": "#e5c34a",
+      "aliases": [
+        "oil",
+        "vegetable oil",
+        "cooking oil",
+        "sunflower oil",
+        "mustard oil",
+        "olive oil",
+        "refined oil",
+        "tel"
+      ]
+    },
+    {
+      "id": "ghee",
+      "name": "Ghee",
+      "density": 0.9,
+      "marker": 9,
+      "color": "#f2d27a",
+      "aliases": [
+        "ghee",
+        "clarified butter",
+        "desi ghee"
+      ]
+    },
+    {
+      "id": "coriander_leaves",
+      "name": "Coriander leaves",
+      "density": 0.1,
+      "marker": 10,
+      "color": "#3c8d2f",
+      "aliases": [
+        "coriander leaves",
+        "cilantro",
+        "hara dhaniya",
+        "fresh coriander",
+        "coriander"
+      ]
+    },
+    {
+      "id": "brown_sugar",
+      "name": "Brown sugar",
+      "density": 0.93,
+      "marker": 11,
+      "color": "#8a5a2b",
+      "aliases": [
+        "brown sugar",
+        "light brown sugar",
+        "dark brown sugar"
+      ]
+    },
+    {
+      "id": "flour",
+      "name": "Flour",
+      "density": 0.53,
+      "marker": 12,
+      "color": "#f3eee2",
+      "aliases": [
+        "flour",
+        "all purpose flour",
+        "all-purpose flour",
+        "maida",
+        "plain flour",
+        "atta",
+        "wheat flour",
+        "whole wheat flour",
+        "cake flour",
+        "bread flour"
+      ]
+    },
+    {
+      "id": "butter",
+      "name": "Butter",
+      "density": 0.95,
+      "marker": 13,
+      "color": "#f6dc8c",
+      "aliases": [
+        "butter",
+        "unsalted butter",
+        "salted butter",
+        "makhan",
+        "makkhan"
+      ]
+    },
+    {
+      "id": "baking_powder",
+      "name": "Baking powder",
+      "density": 0.9,
+      "marker": 14,
+      "color": "#f0f0f0",
+      "aliases": [
+        "baking powder"
+      ]
+    },
+    {
+      "id": "baking_soda",
+      "name": "Baking soda",
+      "density": 1.1,
+      "marker": 15,
+      "color": "#ffffff",
+      "aliases": [
+        "baking soda",
+        "bicarbonate of soda",
+        "bicarbonate",
+        "cooking soda",
+        "meetha soda",
+        "bicarb"
+      ]
+    },
+    {
+      "id": "cocoa",
+      "name": "Cocoa powder",
+      "density": 0.42,
+      "marker": 16,
+      "color": "#5a3520",
+      "aliases": [
+        "cocoa powder",
+        "cocoa",
+        "cacao powder"
+      ]
+    },
+    {
+      "id": "vanilla",
+      "name": "Vanilla",
+      "density": 1.0,
+      "marker": 17,
+      "color": "#3b2412",
+      "aliases": [
+        "vanilla extract",
+        "vanilla essence",
+        "vanilla"
+      ]
+    },
+    {
+      "id": "milk",
+      "name": "Milk",
+      "density": 1.03,
+      "marker": 18,
+      "color": "#fbfaf5",
+      "aliases": [
+        "milk",
+        "whole milk",
+        "doodh"
+      ]
+    },
+    {
+      "id": "cream",
+      "name": "Cream",
+      "density": 1.0,
+      "marker": 19,
+      "color": "#fff8e6",
+      "aliases": [
+        "heavy cream",
+        "fresh cream",
+        "whipping cream",
+        "cream",
+        "malai"
+      ]
+    },
+    {
+      "id": "honey",
+      "name": "Honey",
+      "density": 1.42,
+      "marker": 20,
+      "color": "#e0a526",
+      "aliases": [
+        "honey",
+        "shahad"
+      ]
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "density": 1.0,
+      "marker": 21,
+      "color": "#9fd3ff",
+      "aliases": [
+        "water",
+        "pani",
+        "paani"
+      ]
+    },
+    {
+      "id": "rice",
+      "name": "Rice",
+      "density": 0.85,
+      "marker": 22,
+      "color": "#f2efe6",
+      "aliases": [
+        "basmati rice",
+        "rice",
+        "chawal"
+      ]
+    },
+    {
+      "id": "toor_dal",
+      "name": "Toor dal",
+      "density": 0.8,
+      "marker": 23,
+      "color": "#e8c35a",
+      "aliases": [
+        "toor dal",
+        "arhar dal",
+        "tur dal",
+        "toovar dal",
+        "toor daal"
+      ]
+    },
+    {
+      "id": "moong_dal",
+      "name": "Moong dal",
+      "density": 0.8,
+      "marker": 24,
+      "color": "#e6d35f",
+      "aliases": [
+        "moong dal",
+        "mung dal",
+        "moong daal"
+      ]
+    },
+    {
+      "id": "besan",
+      "name": "Besan",
+      "density": 0.45,
+      "marker": 25,
+      "color": "#e9c46a",
+      "aliases": [
+        "besan",
+        "gram flour",
+        "chickpea flour"
+      ]
+    },
+    {
+      "id": "tea",
+      "name": "Tea leaves",
+      "density": 0.35,
+      "marker": 26,
+      "color": "#4a2c1a",
+      "aliases": [
+        "tea leaves",
+        "tea powder",
+        "chai patti",
+        "black tea"
+      ]
+    },
+    {
+      "id": "ginger_garlic_paste",
+      "name": "Ginger-garlic paste",
+      "density": 1.05,
+      "marker": 27,
+      "color": "#d8c9a0",
+      "aliases": [
+        "ginger garlic paste",
+        "ginger-garlic paste"
+      ]
+    },
+    {
+      "id": "mustard_seeds",
+      "name": "Mustard seeds",
+      "density": 0.7,
+      "marker": 28,
+      "color": "#3a2a1a",
+      "aliases": [
+        "mustard seeds",
+        "rai",
+        "sarson"
+      ]
+    },
+    {
+      "id": "hing",
+      "name": "Hing",
+      "density": 0.6,
+      "marker": 29,
+      "color": "#e8dcc0",
+      "aliases": [
+        "asafoetida",
+        "hing"
+      ]
+    },
+    {
+      "id": "kasuri_methi",
+      "name": "Kasuri methi",
+      "density": 0.15,
+      "marker": 30,
+      "color": "#6b8e3a",
+      "aliases": [
+        "kasuri methi",
+        "dried fenugreek leaves"
+      ]
+    },
+    {
+      "id": "chocolate_chips",
+      "name": "Chocolate chips",
+      "density": 0.7,
+      "marker": 31,
+      "color": "#3b2412",
+      "aliases": [
+        "chocolate chips",
+        "choco chips",
+        "chocolate chunks"
+      ]
+    },
+    {
+      "id": "coriander_seeds",
+      "name": "Coriander seeds",
+      "density": 0.35,
+      "marker": 32,
+      "color": "#b59a5a",
+      "aliases": [
+        "coriander seeds",
+        "dhaniya seeds",
+        "sabut dhaniya",
+        "whole coriander"
+      ]
+    },
+    {
+      "id": "cardamom",
+      "name": "Cardamom",
+      "density": 0.4,
+      "marker": 33,
+      "color": "#9bb36b",
+      "aliases": [
+        "cardamom powder",
+        "elaichi powder",
+        "cardamom",
+        "elaichi"
+      ]
+    }
+  ],
+  "spoons": [
+    {
+      "id": "tsp",
+      "name": "Teaspoon",
+      "ml": 5,
+      "marker": 40
+    },
+    {
+      "id": "tbsp",
+      "name": "Tablespoon",
+      "ml": 15,
+      "marker": 41
+    },
+    {
+      "id": "ladle",
+      "name": "Ladle (kadchi)",
+      "ml": 30,
+      "marker": 42
+    },
+    {
+      "id": "half_tsp",
+      "name": "½ teaspoon",
+      "ml": 2.5,
+      "marker": 43
+    },
+    {
+      "id": "quarter_tsp",
+      "name": "¼ teaspoon",
+      "ml": 1.25,
+      "marker": 44
+    },
+    {
+      "id": "pinch",
+      "name": "Pinch",
+      "ml": 0.3,
+      "marker": null
+    }
+  ],
+  "recipes": {
+    "dal": {
+      "salt": 8,
+      "turmeric": 1.5,
+      "chili": 2,
+      "cumin": 2,
+      "ghee": 12
+    },
+    "khichdi": {
+      "salt": 7,
+      "turmeric": 1,
+      "cumin": 2,
+      "ghee": 10
+    },
+    "rice": {
+      "salt": 4
+    },
+    "biryani": {
+      "salt": 14,
+      "turmeric": 1,
+      "chili": 5,
+      "garam_masala": 5,
+      "oil": 30
+    },
+    "sabzi": {
+      "salt": 6,
+      "turmeric": 1,
+      "chili": 3,
+      "coriander_powder": 3,
+      "oil": 20
+    },
+    "curry": {
+      "salt": 9,
+      "turmeric": 1.5,
+      "chili": 5,
+      "coriander_powder": 4,
+      "garam_masala": 3,
+      "oil": 30
+    },
+    "kheema": {
+      "salt": 8,
+      "turmeric": 1,
+      "chili": 5,
+      "garam_masala": 3,
+      "oil": 25
+    },
+    "poha": {
+      "salt": 4,
+      "turmeric": 1,
+      "sugar": 5,
+      "oil": 10
+    },
+    "chai": {
+      "sugar": 20
+    },
+    "eggs": {
+      "salt": 2,
+      "chili": 1,
+      "oil": 8
+    },
+    "pasta": {
+      "salt": 10
+    },
+    "noodles": {
+      "salt": 4,
+      "oil": 15
+    },
+    "soup": {
+      "salt": 6
+    }
+  }
+}

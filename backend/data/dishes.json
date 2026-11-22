@@ -1,0 +1,255 @@
+{
+  "special": {
+    "_empty": [
+      "an empty gas stove burner",
+      "a gas burner grate with nothing on it",
+      "a bare stove top"
+    ],
+    "_empty_vessel": [
+      "an empty pan on a stove",
+      "an empty steel pot",
+      "an empty wok"
+    ],
+    "_lid": [
+      "a cooking pot covered with a lid",
+      "a closed lid on a pan"
+    ]
+  },
+  "dishes": [
+    {
+      "id": "dal",
+      "name": "Dal",
+      "minutes": 25,
+      "vessel": "pot",
+      "color": "#e0a526",
+      "prompts": [
+        "a pot of yellow dal lentil curry cooking",
+        "boiling yellow lentils in a pot"
+      ],
+      "mass_g": 1000
+    },
+    {
+      "id": "rice",
+      "name": "Rice",
+      "minutes": 18,
+      "vessel": "pot",
+      "color": "#f2efe6",
+      "prompts": [
+        "white rice cooking in a pot",
+        "a pot of boiling rice"
+      ],
+      "mass_g": 900
+    },
+    {
+      "id": "biryani",
+      "name": "Biryani",
+      "minutes": 40,
+      "vessel": "pot",
+      "color": "#d98b3a",
+      "prompts": [
+        "biryani rice with saffron in a large pot",
+        "layered chicken biryani in a pot"
+      ],
+      "mass_g": 1800
+    },
+    {
+      "id": "khichdi",
+      "name": "Khichdi",
+      "minutes": 25,
+      "vessel": "pot",
+      "color": "#e3c26b",
+      "prompts": [
+        "khichdi rice and lentil porridge in a pot"
+      ],
+      "mass_g": 1100
+    },
+    {
+      "id": "chai",
+      "name": "Chai",
+      "minutes": 7,
+      "vessel": "pan",
+      "color": "#b07a4f",
+      "prompts": [
+        "milk tea boiling in a saucepan",
+        "indian masala chai boiling in a small pan"
+      ],
+      "mass_g": 450
+    },
+    {
+      "id": "milk",
+      "name": "Milk",
+      "minutes": 8,
+      "vessel": "pan",
+      "color": "#fbfaf5",
+      "prompts": [
+        "milk boiling in a saucepan",
+        "white milk heating in a pot"
+      ],
+      "mass_g": 500
+    },
+    {
+      "id": "water",
+      "name": "Boiling water",
+      "minutes": 6,
+      "vessel": "pot",
+      "color": "#9fd3ff",
+      "prompts": [
+        "clear water boiling in a pot",
+        "a pot of boiling water with bubbles"
+      ],
+      "mass_g": 1500
+    },
+    {
+      "id": "sabzi",
+      "name": "Sabzi",
+      "minutes": 20,
+      "vessel": "kadhai",
+      "color": "#7aa33a",
+      "prompts": [
+        "mixed vegetable stir fry in a kadhai wok",
+        "indian vegetable sabzi cooking in a wok"
+      ],
+      "mass_g": 700
+    },
+    {
+      "id": "curry",
+      "name": "Chicken curry",
+      "minutes": 35,
+      "vessel": "kadhai",
+      "color": "#b5421f",
+      "prompts": [
+        "red chicken curry cooking in a wok",
+        "meat curry with gravy in a pan"
+      ],
+      "mass_g": 1200
+    },
+    {
+      "id": "kheema",
+      "name": "Kheema",
+      "minutes": 30,
+      "vessel": "kadhai",
+      "color": "#8c4a2b",
+      "prompts": [
+        "minced meat keema cooking in a wok",
+        "ground meat frying in a pan"
+      ],
+      "mass_g": 900
+    },
+    {
+      "id": "fry",
+      "name": "Deep frying",
+      "minutes": 8,
+      "vessel": "kadhai",
+      "color": "#d9a441",
+      "prompts": [
+        "food deep frying in hot oil in a wok",
+        "pakoras frying in oil"
+      ],
+      "mass_g": 600
+    },
+    {
+      "id": "poha",
+      "name": "Poha",
+      "minutes": 10,
+      "vessel": "kadhai",
+      "color": "#f0cf4a",
+      "prompts": [
+        "yellow flattened rice poha in a pan"
+      ],
+      "mass_g": 600
+    },
+    {
+      "id": "noodles",
+      "name": "Noodles",
+      "minutes": 6,
+      "vessel": "kadhai",
+      "color": "#e6c06a",
+      "prompts": [
+        "noodles stir frying in a wok"
+      ],
+      "mass_g": 600
+    },
+    {
+      "id": "roti",
+      "name": "Roti",
+      "minutes": 2,
+      "vessel": "tawa",
+      "color": "#d9b27c",
+      "prompts": [
+        "a roti flatbread on a flat iron griddle",
+        "chapati cooking on a tawa"
+      ],
+      "mass_g": 300
+    },
+    {
+      "id": "paratha",
+      "name": "Paratha",
+      "minutes": 4,
+      "vessel": "tawa",
+      "color": "#c98d43",
+      "prompts": [
+        "paratha flatbread frying on a griddle"
+      ],
+      "mass_g": 400
+    },
+    {
+      "id": "dosa",
+      "name": "Dosa",
+      "minutes": 3,
+      "vessel": "tawa",
+      "color": "#d7a05a",
+      "prompts": [
+        "a thin dosa crepe on a flat griddle"
+      ],
+      "mass_g": 600
+    },
+    {
+      "id": "eggs",
+      "name": "Eggs / omelette",
+      "minutes": 5,
+      "vessel": "pan",
+      "color": "#f5d34a",
+      "prompts": [
+        "an omelette cooking in a frying pan",
+        "fried eggs in a frying pan",
+        "scrambled eggs in a pan"
+      ],
+      "mass_g": 250
+    },
+    {
+      "id": "pasta",
+      "name": "Pasta",
+      "minutes": 12,
+      "vessel": "pot",
+      "color": "#f0d68a",
+      "prompts": [
+        "pasta boiling in a pot of water",
+        "spaghetti in a pot"
+      ],
+      "mass_g": 1000
+    },
+    {
+      "id": "soup",
+      "name": "Soup",
+      "minutes": 20,
+      "vessel": "pot",
+      "color": "#c46a3a",
+      "prompts": [
+        "a pot of soup simmering"
+      ],
+      "mass_g": 1200
+    },
+    {
+      "id": "pressure",
+      "name": "Pressure cooker",
+      "minutes": 15,
+      "vessel": "cooker",
+      "color": "#c0c4cc",
+      "prompts": [
+        "a closed pressure cooker on a gas stove",
+        "a steel pressure cooker with a whistle"
+      ],
+      "mass_g": 1000
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+# Tadka — kitchen vision
+
+Prop your phone over the gas stove. Tadka watches each burner, works out **what's cooking**,
+times **how long each dish has been on the flame**, and shows it all as a live 3D stove on your
+MacBook, with voice alerts when something's done, unattended, or lit with nothing on it.
+
+```
+ ┌──────────────┐  JPEG frames (WebSocket)   ┌────────────────────────────┐   state @4 Hz + events   ┌─────────────────────┐
+ │  Phone        │ ─────────────────────────▶ │  Python backend (Mac)       │ ───────────────────────▶ │  React + three.js    │
+ │  Expo / RN    │ ◀───────────────────────── │  FastAPI · OpenCV · CLIP    │   MJPEG live view        │  3D dashboard        │
+ │  "Tadka Cam"  │   per-burner summary       │  tracker · SQLite history   │ ◀─────── REST ─────────── │  (browser on Mac)    │
+ └──────────────┘                            └────────────────────────────┘                           └─────────────────────┘
+```
+
+## Quick start
+
+```bash
+cd Chef-AI
+./dev.sh --demo        # first run creates the venv + installs everything; --demo needs no phone
+```
+
+Open <http://localhost:5173>. Leave out `--demo` to use the real camera.
+
+**Phone app**
+
+```bash
+cd mobile && npm install && npx expo start
+```
+
+Scan the Expo QR with **Expo Go** (SDK 58) on your phone. In Tadka Cam tap **Scan dashboard QR**
+and scan the code under **Connect phone** on the dashboard. Phone and Mac must be on the same Wi-Fi.
+If macOS asks whether Python may accept incoming connections, click Allow.
+
+**First-time calibration** (dashboard → *Camera & zones*)
+
+1. Drag a box over each burner in the live view, then **Save zones**.
+2. With every burner **off**, click **Capture flame baseline**. This teaches it which blue things
+   (pans, tiles) are not flames.
+
+## Ingredients, spoons & taste profiles
+
+Tadka beeps and says **"Too much salt!"** when what goes into a pot passes what the person you're
+cooking for likes.
+
+- **Labels** (dashboard → *Labels* → Print): each sticker has the name for you (SALT, SUGAR…)
+  and a square code for the camera. Stick them on box lids (facing up) and on spoon handles.
+- **Spoonful = spoon touches a box, then goes over a pot.** Grams = spoon ml × ingredient density
+  × how full that cook's spoons usually are. Spoons are measured once (`data/pantry.json`) instead
+  of guessed from the pan's size: from above, a level and a heaped spoon look the same.
+- **Manual quick-add** on each burner card (+pinch, +½ tsp, +1 tsp, +1 tbsp, undo) for anything
+  the camera misses.
+- **Targets** = recipe grams (`data/pantry.json`, per standard ~4-serving batch) × batch size ×
+  profile multiplier. Alerts: *careful* (one more spoon would overshoot), *too much* (over by more than
+  the profile's tolerance), *spot on*, and *no salt yet?* at half-time.
+- **Profiles** (top bar → *Profiles*): per person, × salt / sugar / chili / … , beep tolerance, and
+  whether their spoons are level or heaped. Switch "cooking for" from the dashboard or the phone.
+
+For best spoon detection, stream at 3 fps while adding spices: a quick scoop can fall between frames.
+
+## Mounting the camera (steam, heat, grease)
+
+Don't mount the phone straight above a pot: that's the hottest, wettest spot.
+
+- **Angle it from the front/side**, about 45° above the stove (cabinet edge, wall shelf, side wall). Steam rises
+  straight up, so the lens stays out of the plume. Zones work on any angle, since you draw them on the camera view.
+- **Turn the chimney / exhaust fan on.** It pulls the steam column away from the lens.
+- **Shield the lens, not the phone.** A clear phone case or a small acrylic window in front of the lens,
+  treated with anti-fog spray (glasses / swimming-goggle spray), is cheap and easy to wipe.
+- **Keep it cool.** Phones throttle or shut off when hot; keep it plugged in, out of direct heat.
+- **Or use a spare camera**: an old phone, or any Wi-Fi camera with an RTSP stream
+  (`python tools/stream_video.py rtsp://<camera-ip>/stream`), so your main phone isn't in the kitchen.
+
+**Hands-free phone (e.g. an old phone with a broken screen).** After the first setup, the app needs no taps:
+on launch it reconnects to the last Mac or scans the Wi-Fi to find it, starts streaming, and dims its
+screen after 20 s. From the dashboard (*Camera & zones → Phone remote*) you can pause/resume, change fps,
+turn on the torch, or buzz the phone, and the top bar shows its battery. It warns when the battery drops
+to 20% or less while unplugged.
+
+**Android spare phone, set up from the Mac.** Turn on USB debugging once, plug in, then run
+`mobile/setup-android-cam.sh`. Over adb it grants the camera permission, exempts the app from
+battery optimisation, installs and opens Expo Go via a mirrored window, and launches Tadka Cam.
+`--wireless` switches to Wi-Fi control so the cable can go. `scrcpy --turn-screen-off` mirrors
+and controls the phone with its own display off.
+
+If the lens fogs anyway, Tadka notices: view sharpness is compared with this camera's normal
+sharpness. After ~4 s below 35% it shows **"lens fogged — wipe it"** (dashboard + phone). Until it
+clears it holds each burner's last flame state, so the timers keep going, and pauses dish recognition
+and spoon counting. Brief steam puffs are ignored.
+
+## How it works
+
+| Signal | How | Where |
+|---|---|---|
+| Flame on/off | bright saturated **blue** pixels in the burner zone, minus the calibrated baseline, with hysteresis (on after 1.5 s, off after 4 s, so a pot briefly hiding the flame doesn't stop the timer) | `backend/app/vision.py`, `tracker.py` |
+| Dish | **OpenCLIP zero-shot**: each dish in `data/dishes.json` is a set of text prompts; each burner crop is scored every 2 s. Evidence is accumulated over the session, and a lid freezes the guess. | `classifier.py` |
+| Learns your kitchen | when you correct a dish, crops are saved to `data/samples/<dish>/` and blended in as few-shot prototypes | `classifier.py` |
+| Stirring / attention | motion bursts in the zone (camera shake subtracted) | `pipeline.py` |
+| Steam | sustained low motion, drives the 3D steam | `tracker.py` |
+| Timer | seconds the flame was **on** (not wall time); target from the dish's typical minutes or your override | `tracker.py` |
+| Alerts | target reached · not stirred for 8 min · lit with nothing on it (40 s sustained, dismissable) | `tracker.py` |
+| History | finished sessions (flame off for 3 min) go to SQLite, under **History** | `storage.py` |
+
+No ML installed? It still works: flame timing, manual dish labels and alerts all run on plain
+OpenCV. `pip install -r requirements-ml.txt` adds dish recognition (runs on the Mac's GPU via MPS).
+
+## Layout
+
+```
+backend/   FastAPI app (python -m app), tests (pytest), tools/stream_video.py
+web/       Vite + React 19 + @react-three/fiber dashboard
+mobile/    Expo SDK 58 camera app
+```
+
+## Handy commands
+
+```bash
+cd backend && .venv/bin/python -m pytest -q                        # tests
+cd backend && .venv/bin/python tools/stream_video.py clip.mp4 --loop  # replay a recording as if it were the phone
+cd web && npm run build    # then the backend serves the dashboard itself at http://<mac-ip>:8000
+```
+
+Settings are environment variables: `TADKA_CLASSIFIER` (auto|clip|mock), `TADKA_CLASSIFY_INTERVAL`,
+`TADKA_UNATTENDED_MIN`, `TADKA_SESSION_GAP`, `TADKA_DEMO=1`, `TADKA_PORT`. See `backend/app/config.py`.
+
+## Known limits
+
+- Dish recognition is zero-shot and has only been checked on synthetic frames, not a real stove yet.
+  Expect to correct it at first; corrections are what make it learn.
+- Flame detection assumes a blue gas flame. Induction or electric stoves need a different signal (heat/glow).
+- Everything stays on your LAN; no frames leave the Mac.
