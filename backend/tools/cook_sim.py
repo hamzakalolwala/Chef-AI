@@ -182,6 +182,7 @@ def cook(dish: str, persona: Persona, seed: int, with_tadka: bool, pantry: Pantr
         pantry.profiles[pantry.active_profile].fill = round(persona.fill_mean, 2)
     misattributed = 0.0
     unknown = 0
+    wrong_kind: Counter = Counter()
 
     trips = plan_trips(recipe, pantry, persona, rng)
     true_g: Counter = Counter()
@@ -218,6 +219,10 @@ def cook(dish: str, persona: Persona, seed: int, with_tadka: bool, pantry: Pantr
                 grams = pantry.grams(ev.ingredient, ev.spoon, 1.0)
                 if ev.ingredient != tr.ingredient:
                     misattributed += 1
+                    wrong_kind["inferred" if ev.inferred else "direct"] += 1
+                    if os.environ.get("COOKSIM_DEBUG"):
+                        print(f"WRONG t={t - tr.t0:5.2f}s into trip (jar {tr.d_jar:.1f}s, move {tr.d_move:.1f}s) "
+                              f"trip={tr.ingredient} got={ev.ingredient} spoon={ev.spoon} inferred={ev.inferred}")
                 tracker.add_ingredient("b1", ev.ingredient, grams, source="camera", amount_label=f"1 {ev.spoon}")
             t += 1 / fps
         # the cook hears the beeps from this trip
@@ -242,6 +247,7 @@ def cook(dish: str, persona: Persona, seed: int, with_tadka: bool, pantry: Pantr
     return {
         "dish": dish, "persona": persona.name, "with_tadka": with_tadka,
         "trips": len([x for x in trips]), "detected": logged_trips, "misattributed": misattributed, "unknown": unknown,
+        "wrong_kind": dict(wrong_kind),
         "true_g": dict(true_g), "logged_g": dict(logged), "recipe": recipe,
         "salty": taste["salty"].verdict if "salty" in taste else None,
         "salty_level": taste["salty"].level if "salty" in taste else None,

@@ -19,9 +19,10 @@ import numpy as np
 from .vision import Zone
 
 DICTIONARY = cv2.aruco.DICT_4X4_50
-LOAD_DISTANCE = 2.5     # spoon within 2.5 × marker size of a box = loading
-LOAD_TTL = 25.0         # a loaded spoon must reach a pot within this many seconds
+LOAD_DISTANCE = 2.0     # spoon within 2× sticker size of a jar = scooping from it (2.5 mislabelled neighbours in sim)
+LOAD_TTL = 10.0         # a loaded spoon must reach a pot within this many seconds
 REPEAT_GUARD = 3.0      # ignore re-entries into the same pot within this window
+SWITCH_AFTER = 2.5      # seconds after scooping before a different jar can take over
 LEFT_POT = 2.0          # a spoon must be away from the pot this long between scoops (stirring doesn't count)
 
 
@@ -103,8 +104,12 @@ class SpoonTracker:
             near = [(np.hypot(b.x - m.x, b.y - m.y), ing) for ing, b in boxes
                     if np.hypot(b.x - m.x, b.y - m.y) <= LOAD_DISTANCE * max(b.size, m.size)]
             if near:
-                st.loaded_with = min(near)[1]
-                st.loaded_at = now
+                jar = min(near)[1]
+                # On its way to the pot the spoon flies past other jars: the jar it was scooped from wins
+                # unless this is clearly a new trip (sim: "last jar seen" mislabelled 60% of spoonfuls).
+                if st.loaded_with is None or jar == st.loaded_with or now - st.loaded_at > SWITCH_AFTER:
+                    st.loaded_with = jar
+                    st.loaded_at = now
                 continue
             if st.loaded_with is not None and now - st.loaded_at > LOAD_TTL:
                 st.loaded_with = None
@@ -114,6 +119,10 @@ class SpoonTracker:
             fresh = now - st.last_in_pot >= LEFT_POT        # came back from somewhere, not just stirring
             st.last_in_pot = now
             loaded, inferred = st.loaded_with, False
+            if loaded and len(st.covered) == 1 and loaded not in st.covered:
+                # The hand over a jar's label is better evidence than where we first spotted the spoon: often
+                # that sighting is mid-flight past a neighbouring jar (sim: fixed most wrong-spice counts).
+                loaded, inferred = next(iter(st.covered)), True
             if loaded is None and fresh:
                 # Didn't catch it at a jar. If exactly one jar's label was covered meanwhile, that's the one;
                 # otherwise report an unknown spoonful rather than guess (guessing mislabelled 70% in sim).
