@@ -12,7 +12,7 @@ export function announce(ev: KitchenEvent, voice: boolean) {
     window.speechSynthesis.speak(u)
   }
   if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-    new Notification(ev.level === 'danger' ? '⚠️ Tadka' : '🍳 Tadka', { body: ev.message, tag: `${ev.burner_id}-${ev.kind}` })
+    new Notification(ev.level === 'danger' ? '⚠️ Sous Chef AI' : '🍳 Sous Chef AI', { body: ev.message, tag: `${ev.burner_id}-${ev.kind}` })
   }
 }
 

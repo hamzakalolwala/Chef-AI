@@ -36,7 +36,7 @@ export default function App() {
   const [sprinkles, setSprinkles] = useState<Record<string, SprinkleCue>>({})
   const [selected, setSelected] = useState<string | null>(null)
   const [panel, setPanel] = useState<Panel>(null)
-  const [voice, setVoice] = useState(() => loadPref('tadka.voice', true))
+  const [voice, setVoice] = useState(() => loadPref('souschef.voice', true))
   const [toasts, setToasts] = useState<KitchenEvent[]>([])
 
   useEffect(
@@ -59,7 +59,7 @@ export default function App() {
   const toggleVoice = () => {
     const v = !voice
     setVoice(v)
-    savePref('tadka.voice', v)
+    savePref('souschef.voice', v)
     if (v && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission()
   }
 
@@ -78,7 +78,7 @@ export default function App() {
         <div className="brand">
           <span className="logo">🍳</span>
           <div>
-            <h1>Tadka</h1>
+            <h1>Sous Chef AI</h1>
             <p>kitchen vision · {active ? `${active} burner${active > 1 ? 's' : ''} cooking` : 'stove idle'}</p>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function App() {
       {empty && (
         <div className="empty">
           <h2>Point your phone at the stove</h2>
-          <p>Tadka watches each burner, recognises the dish, times how long it's been on the flame, and nudges you when it's done, unattended, or lit with nothing on it.</p>
+          <p>Sous Chef AI watches each burner, recognises the dish, times how long it's been on the flame, and nudges you when it's done, unattended, or lit with nothing on it.</p>
           <div className="row">
             <button className="btn primary" onClick={() => setPanel('connect')}>Connect phone</button>
             <button className="btn" onClick={() => api.setDemo(true)}>Try the demo</button>
@@ -151,7 +151,7 @@ export default function App() {
       )}
       {!connected && (
         <div className="empty">
-          <h2>Can't reach the Tadka server</h2>
+          <h2>Can't reach the Sous Chef AI server</h2>
           <p>Start it with <code>cd backend && .venv/bin/python -m app</code> — this page reconnects automatically.</p>
         </div>
       )}

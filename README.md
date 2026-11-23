@@ -1,6 +1,6 @@
-# Tadka — kitchen vision
+# Sous Chef AI — kitchen vision
 
-Prop your phone over the gas stove. Tadka watches each burner, works out **what's cooking**,
+Prop your phone over the gas stove. Sous Chef AI watches each burner, works out **what's cooking**,
 times **how long each dish has been on the flame**, and shows it all as a live 3D stove on your
 MacBook, with voice alerts when something's done, unattended, or lit with nothing on it.
 
@@ -8,7 +8,7 @@ MacBook, with voice alerts when something's done, unattended, or lit with nothin
  ┌──────────────┐  JPEG frames (WebSocket)   ┌────────────────────────────┐   state @4 Hz + events   ┌─────────────────────┐
  │  Phone        │ ─────────────────────────▶ │  Python backend (Mac)       │ ───────────────────────▶ │  React + three.js    │
  │  Expo / RN    │ ◀───────────────────────── │  FastAPI · OpenCV · CLIP    │   MJPEG live view        │  3D dashboard        │
- │  "Tadka Cam"  │   per-burner summary       │  tracker · SQLite history   │ ◀─────── REST ─────────── │  (browser on Mac)    │
+ │"Sous Chef Cam"│   per-burner summary       │  tracker · SQLite history   │ ◀─────── REST ─────────── │  (browser on Mac)    │
  └──────────────┘                            └────────────────────────────┘                           └─────────────────────┘
 ```
 
@@ -27,7 +27,7 @@ Open <http://localhost:5173>. Leave out `--demo` to use the real camera.
 cd mobile && npm install && npx expo start
 ```
 
-Scan the Expo QR with **Expo Go** (SDK 58) on your phone. In Tadka Cam tap **Scan dashboard QR**
+Scan the Expo QR with **Expo Go** (SDK 58) on your phone. In Sous Chef Cam tap **Scan dashboard QR**
 and scan the code under **Connect phone** on the dashboard. Phone and Mac must be on the same Wi-Fi.
 If macOS asks whether Python may accept incoming connections, click Allow.
 
@@ -39,7 +39,7 @@ If macOS asks whether Python may accept incoming connections, click Allow.
 
 ## Ingredients, spoons & taste profiles
 
-Tadka beeps and says **"Too much salt!"** when what goes into a pot passes what the person you're
+Sous Chef AI beeps and says **"Too much salt!"** when what goes into a pot passes what the person you're
 cooking for likes.
 
 - **Labels** (dashboard → *Labels* → Print): each sticker has the name for you (SALT, SUGAR…)
@@ -78,11 +78,11 @@ to 20% or less while unplugged.
 
 **Android spare phone, set up from the Mac.** Turn on USB debugging once, plug in, then run
 `mobile/setup-android-cam.sh`. Over adb it grants the camera permission, exempts the app from
-battery optimisation, installs and opens Expo Go via a mirrored window, and launches Tadka Cam.
+battery optimisation, installs and opens Expo Go via a mirrored window, and launches Sous Chef Cam.
 `--wireless` switches to Wi-Fi control so the cable can go. `scrcpy --turn-screen-off` mirrors
 and controls the phone with its own display off.
 
-If the lens fogs anyway, Tadka notices: view sharpness is compared with this camera's normal
+If the lens fogs anyway, Sous Chef AI notices: view sharpness is compared with this camera's normal
 sharpness. After ~4 s below 35% it shows **"lens fogged — wipe it"** (dashboard + phone). Until it
 clears it holds each burner's last flame state, so the timers keep going, and pauses dish recognition
 and spoon counting. Brief steam puffs are ignored.
@@ -119,8 +119,8 @@ cd backend && .venv/bin/python tools/stream_video.py clip.mp4 --loop  # replay a
 cd web && npm run build    # then the backend serves the dashboard itself at http://<mac-ip>:8000
 ```
 
-Settings are environment variables: `TADKA_CLASSIFIER` (auto|clip|mock), `TADKA_CLASSIFY_INTERVAL`,
-`TADKA_UNATTENDED_MIN`, `TADKA_SESSION_GAP`, `TADKA_DEMO=1`, `TADKA_PORT`. See `backend/app/config.py`.
+Settings are environment variables: `SOUSCHEF_CLASSIFIER` (auto|clip|mock), `SOUSCHEF_CLASSIFY_INTERVAL`,
+`SOUSCHEF_UNATTENDED_MIN`, `SOUSCHEF_SESSION_GAP`, `SOUSCHEF_DEMO=1`, `SOUSCHEF_PORT`. See `backend/app/config.py`.
 
 ## Known limits
 

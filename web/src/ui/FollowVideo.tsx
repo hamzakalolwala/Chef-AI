@@ -9,7 +9,7 @@ const watchAt = (url: string, t: number | null) => (t == null ? url : `${url}${u
 
 type Recent = Awaited<ReturnType<typeof api.videos>>
 
-/** Paste a YouTube recipe → review what Tadka read → follow it on a burner. */
+/** Paste a YouTube recipe → review what Sous Chef AI read → follow it on a burner. */
 export function FollowVideo({ pantry, burners, onClose }: { pantry: Pantry; burners: Burner[]; onClose: () => void }) {
   const [url, setUrl] = useState('')
   const [busy, setBusy] = useState(false)
@@ -53,7 +53,7 @@ export function FollowVideo({ pantry, burners, onClose }: { pantry: Pantry; burn
       const saved = await api.saveVideo({ ...recipe, servings: servings ? Number(servings) : null })
       setRecipe(saved)
       await api.follow(burner, saved.id, Number(scale) || 1)
-      setMsg(`Following on ${burners.find((b) => b.id === burner)?.name}. Tadka will beep if you add more than this.`)
+      setMsg(`Following on ${burners.find((b) => b.id === burner)?.name}. Sous Chef AI will beep if you add more than this.`)
     } catch (e) {
       setMsg(String((e as Error).message))
     }
@@ -76,7 +76,7 @@ export function FollowVideo({ pantry, burners, onClose }: { pantry: Pantry; burn
         </button>
       </div>
       <p className="hint">
-        Tadka reads the video's description and captions (what the cook writes and says). It doesn't watch the
+        Sous Chef AI reads the video's description and captions (what the cook writes and says). It doesn't watch the
         video. Check the amounts below before you follow it.
       </p>
       {err && <p className="error">{err}</p>}

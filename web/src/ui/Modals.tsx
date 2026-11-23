@@ -35,7 +35,7 @@ export function ConnectPhone({ info, onClose }: { info: ServerInfo | null; onClo
         {qr ? <img src={qr} alt="QR code for the camera connection" className="qr" /> : <div className="qr placeholder" />}
         <ol>
           <li>Phone and Mac on the <b>same Wi-Fi</b>.</li>
-          <li>Open the <b>Tadka Cam</b> app → <b>Scan dashboard QR</b>.</li>
+          <li>Open the <b>Sous Chef Cam</b> app → <b>Scan dashboard QR</b>.</li>
           <li>Prop the phone above the stove so every burner is in frame, then tap <b>Start</b>.</li>
         </ol>
         <code className="url">{info?.camera_ws ?? '…'}</code>

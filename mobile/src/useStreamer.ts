@@ -20,7 +20,7 @@ export type ProfileLite = { id: string; name: string; emoji: string }
 export type Command = { cmd: 'pause' | 'resume' | 'fps' | 'torch' | 'buzz'; value?: number | boolean }
 
 /**
- * Captures a still from the camera every 1/fps seconds and pushes it to the Tadka backend as
+ * Captures a still from the camera every 1/fps seconds and pushes it to the Sous Chef AI backend as
  * JSON {type:"frame", jpeg:<base64>} over a WebSocket. Cooking changes slowly, so 1-3 fps of
  * small JPEGs is plenty and keeps the phone cool. Reconnects automatically.
  */
@@ -54,7 +54,7 @@ export function useStreamer(
       ws.current = sock
       sock.onopen = () => {
         setConn('open')
-        sock.send(JSON.stringify({ type: 'hello', device: 'Tadka Cam' }))
+        sock.send(JSON.stringify({ type: 'hello', device: 'Sous Chef Cam' }))
       }
       sock.onmessage = (m) => {
         try {

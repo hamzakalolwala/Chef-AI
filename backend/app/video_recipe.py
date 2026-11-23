@@ -17,7 +17,7 @@ from .config import DATA_DIR
 from .pantry import Pantry
 from .recipe_text import AliasMatcher, combine, find_servings, first_mentions, parse_captions, parse_description
 
-log = logging.getLogger("tadka.video")
+log = logging.getLogger("souschef.video")
 VIDEOS_DIR = DATA_DIR / "videos"
 ID_RE = re.compile(r"(?:v=|youtu\.be/|shorts/|embed/|live/)([A-Za-z0-9_-]{11})")
 

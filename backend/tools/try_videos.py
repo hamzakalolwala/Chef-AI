@@ -7,7 +7,7 @@ import os
 import sys
 import tempfile
 
-os.environ.setdefault("TADKA_DATA_DIR", tempfile.mkdtemp(prefix="tadka-videos-"))
+os.environ.setdefault("SOUSCHEF_DATA_DIR", tempfile.mkdtemp(prefix="souschef-videos-"))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.pantry import Pantry  # noqa: E402

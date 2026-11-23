@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Tadka Cam",
-    "slug": "tadka-cam",
+    "name": "Sous Chef Cam",
+    "slug": "souschef-cam",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tadka.cam",
+      "bundleIdentifier": "com.souschef.cam",
       "infoPlist": {
-        "NSLocalNetworkUsageDescription": "Tadka Cam streams your stove camera to the Tadka dashboard on your Mac over Wi-Fi.",
+        "NSLocalNetworkUsageDescription": "Sous Chef Cam streams your stove camera to the Sous Chef AI dashboard on your Mac over Wi-Fi.",
         "NSAppTransportSecurity": {
           "NSAllowsLocalNetworking": true
         }
@@ -24,7 +24,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tadka.cam",
+      "package": "com.souschef.cam",
       "permissions": [
         "android.permission.CAMERA"
       ]
@@ -36,7 +36,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Tadka Cam watches your stove so the dashboard can time each dish.",
+          "cameraPermission": "Sous Chef Cam watches your stove so the dashboard can time each dish.",
           "recordAudioAndroid": false,
           "microphonePermission": false
         }

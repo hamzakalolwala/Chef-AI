@@ -1,9 +1,9 @@
 import * as Network from 'expo-network'
 
 /**
- * Find the Tadka server on the local Wi-Fi without typing or scanning anything:
+ * Find the Sous Chef AI server on the local Wi-Fi without typing or scanning anything:
  * probe http://<every address in this phone's /24 subnet>:8000/api/info and take the first
- * one that answers like Tadka. ~254 tiny requests, done in parallel batches (a few seconds).
+ * one that answers like Sous Chef AI. ~254 tiny requests, done in parallel batches (a few seconds).
  */
 export async function discoverServer(opts: { port?: number; hint?: string; onProgress?: (done: number, total: number) => void } = {}): Promise<string | null> {
   const port = opts.port ?? 8000
@@ -41,7 +41,7 @@ export async function discoverServer(opts: { port?: number; hint?: string; onPro
   return null
 }
 
-/** Returns the server's camera WebSocket URL if `base` is a Tadka server. */
+/** Returns the server's camera WebSocket URL if `base` is a Sous Chef AI server. */
 async function probe(base: string, timeoutMs: number): Promise<string | null> {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), timeoutMs)

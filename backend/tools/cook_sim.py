@@ -8,7 +8,7 @@ For each simulated dish:
      the spoon, motion blur, hands covering the spoon, random angles, JPEG) and goes through the real
      MarkerDetector -> SpoonTracker -> Tracker, which logs grams and beeps;
   3. the cook reacts to the beeps (skips the extra spoon, dilutes an over-salted pot);
-  4. the finished dish is tasted with app/taste.py, and compared with the same cook *without* Tadka.
+  4. the finished dish is tasted with app/taste.py, and compared with the same cook *without* Sous Chef AI.
 
     python tools/cook_sim.py --dishes 120
 """
@@ -24,7 +24,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-os.environ.setdefault("TADKA_DATA_DIR", tempfile.mkdtemp(prefix="tadka-cooksim-"))
+os.environ.setdefault("SOUSCHEF_DATA_DIR", tempfile.mkdtemp(prefix="souschef-cooksim-"))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.dishes import load_catalog  # noqa: E402
@@ -159,7 +159,7 @@ def plan_trips(recipe: dict[str, float], pantry: Pantry, persona: Persona, rng: 
     return trips
 
 
-def cook(dish: str, persona: Persona, seed: int, with_tadka: bool, pantry: Pantry, fps: float = 2.0,
+def cook(dish: str, persona: Persona, seed: int, with_souschef: bool, pantry: Pantry, fps: float = 2.0,
          calibrated: bool = False) -> dict:
     rng = np.random.default_rng(seed)
     catalog = load_catalog()
@@ -194,7 +194,7 @@ def cook(dish: str, persona: Persona, seed: int, with_tadka: bool, pantry: Pantr
         if tr.ingredient in skipped:
             continue
         true_g[tr.ingredient] += pantry.spoons[tr.spoon].ml * pantry.ingredients[tr.ingredient].density * tr.fill
-        if not with_tadka:
+        if not with_souschef:
             continue
         n_before = len(events)
         t = phase + np.ceil((tr.t0 - phase) * fps) / fps
@@ -245,7 +245,7 @@ def cook(dish: str, persona: Persona, seed: int, with_tadka: bool, pantry: Pantr
     taste = {r.taste: r for r in forecast(dict(true_g), recipe, mass)}
     logged = tracker.burners["b1"].session.ingredients if tracker.burners["b1"].session else {}
     return {
-        "dish": dish, "persona": persona.name, "with_tadka": with_tadka,
+        "dish": dish, "persona": persona.name, "with_souschef": with_souschef,
         "trips": len([x for x in trips]), "detected": logged_trips, "misattributed": misattributed, "unknown": unknown,
         "wrong_kind": dict(wrong_kind),
         "true_g": dict(true_g), "logged_g": dict(logged), "recipe": recipe,

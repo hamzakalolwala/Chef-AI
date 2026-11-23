@@ -32,8 +32,8 @@ const C = {
   red: '#ff5a4f',
   blue: '#6ea8ff',
 }
-const URL_KEY = 'tadka.serverUrl'
-const FPS_KEY = 'tadka.fps'
+const URL_KEY = 'souschef.serverUrl'
+const FPS_KEY = 'souschef.fps'
 
 type Screen = 'boot' | 'discover' | 'setup' | 'scan' | 'stream'
 const DIM_AFTER_MS = 20000
@@ -79,7 +79,7 @@ function Setup({ url, setUrl, fps, setFps, onScan, onStart, onDiscover }: {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.setup} keyboardShouldPersistTaps="handled">
         <Text style={s.logo}>🍳</Text>
-        <Text style={s.title}>Tadka Cam</Text>
+        <Text style={s.title}>Sous Chef Cam</Text>
         <Text style={s.sub}>Turns this phone into the eyes over your stove. Your Mac does the thinking.</Text>
 
         <Button label="Find my Mac automatically" kind="primary" onPress={onDiscover} />
@@ -163,7 +163,7 @@ function Discovering({ hint, onFound, onFail }: { hint: string; onFound: (url: s
     <View style={[s.setup, { alignItems: 'center', justifyContent: 'center', flex: 1 }]}>
       <ActivityIndicator color={C.saffron} size="large" />
       <Text style={s.title}>Looking for your Mac…</Text>
-      <Text style={s.sub}>Make sure the Tadka server is running and this phone is on the same Wi-Fi. {progress}</Text>
+      <Text style={s.sub}>Make sure the Sous Chef AI server is running and this phone is on the same Wi-Fi. {progress}</Text>
     </View>
   )
 }
@@ -338,7 +338,7 @@ export default function App() {
     body = (
       <View style={s.setup}>
         <Text style={s.title}>Camera access is off</Text>
-        <Text style={s.sub}>Enable camera access for Tadka Cam in Settings to stream your stove.</Text>
+        <Text style={s.sub}>Enable camera access for Sous Chef Cam in Settings to stream your stove.</Text>
       </View>
     )
   } else if (screen === 'scan') {

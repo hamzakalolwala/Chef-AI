@@ -51,7 +51,7 @@ export function ProfilesEditor({ pantry, onSaved, onClose }: { pantry: Pantry; o
   return (
     <Modal title="Taste profiles" onClose={onClose} wide>
       <p className="hint">
-        Each profile scales the recipe amounts. Tadka beeps when what goes in passes the target by more than the tolerance.
+        Each profile scales the recipe amounts. Sous Chef AI beeps when what goes in passes the target by more than the tolerance.
         Pick who you're cooking for in the top bar.
       </p>
       <div className="profiles">

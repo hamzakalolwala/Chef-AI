@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 import cv2
 import numpy as np
 
-os.environ.setdefault("TADKA_DATA_DIR", tempfile.mkdtemp(prefix="tadka-sim-"))
+os.environ.setdefault("SOUSCHEF_DATA_DIR", tempfile.mkdtemp(prefix="souschef-sim-"))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.dishes import load_catalog  # noqa: E402

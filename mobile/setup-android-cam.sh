@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup: turn an Android phone (cracked screen is fine) into Tadka's stove camera,
+# One-time setup: turn an Android phone (cracked screen is fine) into Sous Chef AI's stove camera,
 # driving it from the Mac over USB. Tested flow for Motorola / stock-ish Android 12+.
 #
 #   ./setup-android-cam.sh             # USB cable
@@ -54,7 +54,7 @@ ok "phone $PHONE_IP, Mac ${MAC_IP:-unknown}"
 [[ -n "$MAC_IP" && "${PHONE_IP%.*}" != "${MAC_IP%.*}" ]] && echo "  ⚠ Different subnets: the phone may not find the Mac. Use the same Wi-Fi network."
 
 # --------------------------------------------------------------------------------------------
-say "Expo Go (runs the Tadka Cam app)"
+say "Expo Go (runs the Sous Chef Cam app)"
 if ! adb shell pm list packages "$EXPO_GO" | grep -q "$EXPO_GO"; then
   echo "  Opening Expo Go in the Play Store on the phone, mirrored here: click Install with your mouse."
   adb shell am start -a android.intent.action.VIEW -d "market://details?id=$EXPO_GO" >/dev/null
@@ -74,15 +74,15 @@ adb shell dumpsys deviceidle whitelist "+$EXPO_GO" >/dev/null && ok "excluded fr
 adb shell svc power stayon true && ok "screen stays on while powered (the app also keeps itself awake)"
 
 # --------------------------------------------------------------------------------------------
-say "Opening Tadka Cam on the phone"
+say "Opening Sous Chef Cam on the phone"
 if ! curl -s "http://localhost:$METRO_PORT/status" | grep -q running; then
   echo "  Starting the app server (npx expo start) in the background…"
-  (CI=1 npx expo start --lan --port "$METRO_PORT" >/tmp/tadka-expo.log 2>&1 &)
+  (CI=1 npx expo start --lan --port "$METRO_PORT" >/tmp/souschef-expo.log 2>&1 &)
   for _ in $(seq 1 60); do curl -s "http://localhost:$METRO_PORT/status" | grep -q running && break; sleep 2; done
 fi
-curl -s "http://localhost:$METRO_PORT/status" | grep -q running || die "Expo dev server didn't start; see /tmp/tadka-expo.log"
+curl -s "http://localhost:$METRO_PORT/status" | grep -q running || die "Expo dev server didn't start; see /tmp/souschef-expo.log"
 adb shell am start -a android.intent.action.VIEW -d "exp://$MAC_IP:$METRO_PORT" "$EXPO_GO" >/dev/null
-ok "launched. It finds the Tadka server by itself and starts streaming."
+ok "launched. It finds the Sous Chef AI server by itself and starts streaming."
 echo "  (Keep 'cd backend && .venv/bin/python -m app' running on the Mac.)"
 
 # --------------------------------------------------------------------------------------------

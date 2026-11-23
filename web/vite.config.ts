@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-const backend = process.env.TADKA_BACKEND ?? 'http://localhost:8000'
+const backend = process.env.SOUSCHEF_BACKEND ?? 'http://localhost:8000'
 
 export default defineConfig({
   plugins: [react()],

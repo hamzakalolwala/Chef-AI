@@ -23,7 +23,7 @@ import numpy as np
 from .config import DATA_DIR
 from .dishes import Catalog
 
-log = logging.getLogger("tadka.classifier")
+log = logging.getLogger("souschef.classifier")
 SAMPLES_DIR = DATA_DIR / "samples"
 MAX_SAMPLES_PER_DISH = 60
 FEWSHOT_WEIGHT = 0.6

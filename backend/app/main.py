@@ -1,4 +1,4 @@
-"""Tadka backend.
+"""Sous Chef AI backend.
 
 Phone (React Native)  --JPEG frames over WS /ws/camera-->  this server
 this server  --state @ 4 Hz + events over WS /ws/dashboard-->  React 3D dashboard
@@ -34,7 +34,7 @@ from .tracker import Burner, Session, Tracker
 from .vision import ClarityMonitor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
-log = logging.getLogger("tadka")
+log = logging.getLogger("souschef")
 
 ZONES_FILE = DATA_DIR / "zones.json"
 DEFAULT_BURNERS = [
@@ -326,7 +326,7 @@ async def lifespan(_: FastAPI):
         t.cancel()
 
 
-app = FastAPI(title="Tadka — cooking monitor", lifespan=lifespan)
+app = FastAPI(title="Sous Chef AI — cooking monitor", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
