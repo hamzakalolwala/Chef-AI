@@ -69,6 +69,7 @@ class Burner:
     name: str
     zone: Zone
     baseline_blue: float = 0.0
+    source: str = "lpg_large"            # lpg_large | lpg_small | induction (see heat.py)
     # live signals
     flame_score: float = 0.0
     flame_auto: bool = False
@@ -121,14 +122,15 @@ class Tracker:
                 b = Burner(id=s["id"], name=s["name"], zone=zone)
             b.name, b.zone = s["name"], zone
             b.baseline_blue = float(s.get("baseline_blue", b.baseline_blue))
+            b.source = s.get("source", b.source)
             new[b.id] = b
         for gone in set(self.burners) - set(new):
             self._end_session(self.burners[gone], self.clock())
         self.burners = new
 
     def burner_specs(self) -> list[dict]:
-        return [{"id": b.id, "name": b.name, "zone": b.zone.as_dict(), "baseline_blue": b.baseline_blue}
-                for b in self.burners.values()]
+        return [{"id": b.id, "name": b.name, "zone": b.zone.as_dict(), "baseline_blue": b.baseline_blue,
+                 "source": b.source} for b in self.burners.values()]
 
     # -- events ---------------------------------------------------------------------------
     def emit(self, burner: Burner | None, kind: str, message: str, level: str = "info",
@@ -146,6 +148,8 @@ class Tracker:
         if b is None:
             return
         now = self.clock() if now is None else now
+        if b.source == "induction":
+            flame = 0.0          # no flame to see: an induction burner is switched On from the dashboard/phone
         b.flame_score = flame
         b.motion = motion
         b.steam = (1 - STEAM_ALPHA) * b.steam + STEAM_ALPHA * min(1.0, motion / 0.05)
@@ -534,6 +538,7 @@ class Tracker:
             out.append({
                 "id": b.id,
                 "name": b.name,
+                "source": b.source,
                 "zone": b.zone.as_dict(),
                 "status": status,
                 "flame": {"on": b.flame_on, "score": round(b.flame_score, 3), "manual": b.flame_manual},

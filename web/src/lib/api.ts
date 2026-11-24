@@ -1,5 +1,5 @@
 import { MOCK, mockSend } from './mock'
-import type { HistoryRow, Pantry, Profile, VideoRecipe, Zone } from './types'
+import type { HeatSource, HistoryRow, LabEval, LabOptions, LabResult, Pantry, Profile, VideoRecipe, Zone } from './types'
 
 // Same origin by default (Vite proxies /api and /ws in dev; the backend serves the build in prod).
 // Override with ?server=192.168.1.20:8000
@@ -50,7 +50,10 @@ export const api = {
   saveProfiles: (profiles: Profile[], active?: string) => send<Pantry>('PUT', '/api/profiles', { profiles, active }),
   reset: (id: string) => send('POST', `/api/burners/${id}/reset`),
   setDemo: (enabled: boolean) => send('POST', '/api/demo', { enabled }),
-  saveZones: (burners: { id: string; name: string; zone: Zone }[]) => send('PUT', '/api/zones', burners),
+  saveZones: (burners: { id: string; name: string; zone: Zone; source?: HeatSource }[]) => send('PUT', '/api/zones', burners),
+  labOptions: () => send<LabOptions>('GET', '/api/lab/options'),
+  lab: (body: { dish: string; recipe: Record<string, number | boolean>; source: string; vessel?: string | null; profile_ids: string[]; mode: string }) =>
+    send<LabResult & LabEval>('POST', '/api/lab', body),
   captureBaseline: () => send('POST', '/api/calibrate/baseline'),
   history: () =>
     send<{ sessions: HistoryRow[]; stats: { dish: string; sessions: number; total_seconds: number; avg_seconds: number }[] }>(

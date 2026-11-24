@@ -127,3 +127,14 @@ def test_blue_flame_detection_on_synthetic_image():
     assert flame_score(blue_fraction(img), 0.0) == 0.0
     cv2.circle(img, (50, 50), 30, (255, 120, 30), 3)  # BGR bright blue ring
     assert flame_score(blue_fraction(img), 0.0) == 1.0
+
+
+def test_induction_burner_ignores_blue_in_view_and_runs_on_manual():
+    t, c = make()
+    t.set_burners([{"id": "b1", "name": "Induction", "zone": {"x": 0, "y": 0, "w": 0.5, "h": 0.5},
+                    "source": "induction"}])
+    run(t, c, 10, flame=1.0)                 # a blue pan on the glass: not a flame
+    assert t.burners["b1"].session is None
+    t.set_manual_flame("b1", True)
+    run(t, c, 10, flame=0.0)
+    assert t.burners["b1"].session is not None and t.snapshot()[0]["source"] == "induction"

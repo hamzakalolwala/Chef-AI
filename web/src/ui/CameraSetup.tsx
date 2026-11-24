@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
 import { api, apiUrl } from '../lib/api'
-import type { Burner, PhoneStatus, Zone } from '../lib/types'
+import type { Burner, HeatSource, PhoneStatus, Zone } from '../lib/types'
 import { Modal } from './Modals'
 
-type Draft = { id: string; name: string; zone: Zone }
+type Draft = { id: string; name: string; zone: Zone; source: HeatSource }
 type Drag = { idx: number; mode: 'move' | 'resize'; startX: number; startY: number; orig: Zone }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
@@ -42,7 +42,7 @@ function PhoneRemote({ phone }: { phone: PhoneStatus | null }) {
 }
 
 export function CameraSetup({ burners, streaming, phone, onClose }: { burners: Burner[]; streaming: boolean; phone?: PhoneStatus | null; onClose: () => void }) {
-  const [draft, setDraft] = useState<Draft[]>(() => burners.map(({ id, name, zone }) => ({ id, name, zone: { ...zone } })))
+  const [draft, setDraft] = useState<Draft[]>(() => burners.map(({ id, name, zone, source }) => ({ id, name, zone: { ...zone }, source: source ?? 'lpg_large' })))
   const [msg, setMsg] = useState<string | null>(null)
   const box = useRef<HTMLDivElement>(null)
   const drag = useRef<Drag | null>(null)
@@ -76,7 +76,7 @@ export function CameraSetup({ burners, streaming, phone, onClose }: { burners: B
     const n = draft.length + 1
     let id = `b${n}`
     while (draft.some((d) => d.id === id)) id += 'x'
-    setDraft([...draft, { id, name: `Burner ${n}`, zone: { x: 0.35, y: 0.35, w: 0.3, h: 0.3 } }])
+    setDraft([...draft, { id, name: `Burner ${n}`, zone: { x: 0.35, y: 0.35, w: 0.3, h: 0.3 }, source: 'lpg_large' }])
   }
 
   const save = async () => {
@@ -122,6 +122,11 @@ export function CameraSetup({ burners, streaming, phone, onClose }: { burners: B
           {draft.map((b, i) => (
             <div className="zone-row" key={b.id}>
               <input value={b.name} onChange={(e) => setDraft(draft.map((d, j) => (j === i ? { ...d, name: e.target.value } : d)))} />
+              <select value={b.source} aria-label={`${b.name} type`} onChange={(e) => setDraft(draft.map((d, j) => (j === i ? { ...d, source: e.target.value as HeatSource } : d)))}>
+                <option value="lpg_large">LPG large</option>
+                <option value="lpg_small">LPG small</option>
+                <option value="induction">Induction</option>
+              </select>
               <button className="icon-btn" disabled={draft.length <= 1} onClick={() => setDraft(draft.filter((_, j) => j !== i))} aria-label={`Remove ${b.name}`}>✕</button>
             </div>
           ))}

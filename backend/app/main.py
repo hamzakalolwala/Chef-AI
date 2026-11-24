@@ -27,6 +27,7 @@ from .demo import run_demo
 from .dishes import load_catalog
 from .markers import SpoonTracker, marker_png
 from .pantry import Pantry
+from .recipe_lab import DISHES as LAB_DISHES, improve as lab_improve, options as lab_options
 from .video_recipe import fetch_recipe, list_recipes, load_recipe, save_recipe, video_id
 from .pipeline import FrameAnalysis, Pipeline
 from .storage import Storage
@@ -344,6 +345,7 @@ class BurnerIn(BaseModel):
     id: str = Field(min_length=1, max_length=32)
     name: str = Field(min_length=1, max_length=40)
     zone: ZoneIn
+    source: str = Field(default="lpg_large", pattern="^(lpg_large|lpg_small|induction)$")
 
 
 class OverrideIn(BaseModel):
@@ -415,6 +417,15 @@ class FollowIn(BaseModel):
 class RatingIn(BaseModel):
     profile_id: str | None = None
     ratings: dict[str, str]          # {"salty": "too much" | "right" | "too little", "heat": ...}
+
+
+class LabIn(BaseModel):
+    dish: str = Field(pattern="^(chai|tadka)$")
+    recipe: dict = Field(default_factory=dict)
+    source: str = "lpg_large"
+    vessel: str | None = None
+    profile_ids: list[str] = Field(default_factory=list)
+    mode: str = Field(default="upgrade", pattern="^(upgrade|new|evaluate)$")
 
 
 class DismissIn(BaseModel):
@@ -571,6 +582,32 @@ async def unfollow(bid: str) -> dict:
     _burner(bid)
     state.tracker.set_follow(bid, None)
     return {"ok": True}
+
+
+@app.get("/api/lab/options")
+def lab_opts() -> dict:
+    return lab_options()
+
+
+@app.post("/api/lab")
+async def lab(body: LabIn) -> dict:
+    """Recipe Lab: evaluate, upgrade ('no aftertaste') or generate a chai / tadka for a burner type."""
+    from .heat import SOURCES, VESSELS
+    if body.source not in SOURCES or (body.vessel and body.vessel not in VESSELS):
+        raise HTTPException(400, "unknown heat source or pot")
+    cls, bounds, evaluate, default_vessel = LAB_DISHES[body.dish]
+    allowed = set(cls().public())
+    if set(body.recipe) - allowed:
+        raise HTTPException(400, f"unknown recipe fields: {sorted(set(body.recipe) - allowed)}")
+    people = [state.pantry.profiles[i] for i in body.profile_ids if i in state.pantry.profiles] or \
+        [state.pantry.profile]
+    if body.mode == "evaluate":
+        res = await asyncio.to_thread(evaluate, cls(**body.recipe), body.source, body.vessel or default_vessel, people)
+    else:
+        res = await asyncio.to_thread(lab_improve, body.dish, body.recipe, body.source, body.vessel, people, body.mode)
+    if "error" in res:
+        raise HTTPException(409, res["error"])
+    return res
 
 
 @app.get("/api/pantry")

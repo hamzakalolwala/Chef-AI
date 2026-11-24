@@ -90,6 +90,7 @@ export function BurnerCard({ b, dishes, pantry, selected, onSelect }: {
       <div className="card-head">
         <span className={`flame-dot ${b.flame.on ? 'on' : ''}`} />
         <span className="burner-name">{b.name}</span>
+        {b.source === 'induction' && <span className="src-tag">induction</span>}
         <span className="status-chip">{STATUS_LABEL[b.status]}</span>
       </div>
 
@@ -123,6 +124,12 @@ export function BurnerCard({ b, dishes, pantry, selected, onSelect }: {
       <FollowBadge b={b} />
       <IngredientPanel b={b} pantry={pantry} expanded={selected && !editing} />
       <TonguePanel b={b} expanded={selected && !editing} />
+
+      {b.source === 'induction' && !s && (
+        <p className="hint" onClick={(e) => e.stopPropagation()}>
+          Induction: the camera can't see it heating. <button className="chip" onClick={() => api.setFlame(b.id, true)}>Tap On</button> when you switch it on.
+        </p>
+      )}
 
       {b.status === 'danger' && (
         <div className="actions" onClick={(e) => e.stopPropagation()}>

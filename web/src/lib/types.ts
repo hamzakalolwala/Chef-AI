@@ -92,9 +92,12 @@ export type Pantry = {
   active_profile: string
 }
 
+export type HeatSource = 'lpg_large' | 'lpg_small' | 'induction'
+
 export type Burner = {
   id: string
   name: string
+  source?: HeatSource
   zone: Zone
   status: Status
   flame: { on: boolean; score: number; manual: boolean | null }
@@ -156,3 +159,23 @@ export type HistoryRow = {
 }
 
 export type PhoneStatus = { battery: number | null; charging: boolean | null; paused: boolean; fps: number; torch: boolean }
+
+export type LabPerson = {
+  id: string; name: string; emoji: string; score: number; finish: number; complaint: string | null
+  sip: Record<string, number>; after: Record<string, number>
+}
+export type LabEval = {
+  dish: string; score: number; people: LabPerson[]; sim: Record<string, any>
+  temps: [number, number, number, number][]; recipe?: Record<string, number | boolean>
+}
+export type LabResult = {
+  dish: string; mode: string; source: string; vessel: string; before: LabEval; after: LabEval; changes: string[]
+  steps: { t: number; text: string; dur: number }[]
+  same_recipe_on_other_sources: Record<string, { score: number; minutes: number | null; complaints: string[] } | null>
+}
+export type LabOptions = {
+  sources: { id: string; name: string; kind: string }[]
+  vessels: { id: string; name: string; induction_ok: boolean }[]
+  dishes: Record<string, Record<string, number | boolean>>
+  bounds: Record<string, Record<string, [number, number]>>
+}

@@ -5,6 +5,7 @@
  */
 import dishesJson from '../../../backend/data/dishes.json'
 import pantryJson from '../../../backend/data/pantry.json'
+import labSamples from './labSamples.json'
 import { liking as tLiking, perceive, stimulus as tStim } from './tongue'
 import type { Burner, Dish, FollowState, KitchenEvent, KitchenState, Pantry, Profile, Status, VideoRecipe } from './types'
 
@@ -53,7 +54,7 @@ const CHAI: VideoRecipe = {
 const videos: Record<string, VideoRecipe> = { [COOKIES.id]: COOKIES, [CHAI.id]: CHAI }
 
 type MB = {
-  id: string; name: string; zone: Burner['zone']
+  id: string; name: string; zone: Burner['zone']; source: 'lpg_large' | 'lpg_small' | 'induction'
   lit: boolean; manual: boolean | null; session: boolean
   cook: number; started: number; dish: string | null; label: string | null; target: number | null; batch: number
   stirs: number; lastAttention: number; ingredients: Record<string, number>; log: { ing: string; g: number }[]
@@ -63,7 +64,7 @@ const ZONES = [
   { id: 'b1', name: 'Back left', zone: { x: 0.06, y: 0.08, w: 0.4, h: 0.4 } },
   { id: 'b2', name: 'Back right', zone: { x: 0.54, y: 0.08, w: 0.4, h: 0.4 } },
   { id: 'b3', name: 'Front left', zone: { x: 0.06, y: 0.52, w: 0.4, h: 0.4 } },
-  { id: 'b4', name: 'Front right', zone: { x: 0.54, y: 0.52, w: 0.4, h: 0.4 } },
+  { id: 'b4', name: 'Front right', zone: { x: 0.54, y: 0.52, w: 0.4, h: 0.4 }, source: 'induction' as const },
 ]
 let burners: MB[] = []
 let events: KitchenEvent[] = []
@@ -80,7 +81,7 @@ function emit(b: MB | null, kind: string, message: string, level: KitchenEvent['
 }
 
 function fresh(z: (typeof ZONES)[number]): MB {
-  return { ...z, lit: false, manual: null, session: false, cook: 0, started: 0, dish: null, label: null, target: null, batch: 1,
+  return { source: 'lpg_large', ...z, lit: false, manual: null, session: false, cook: 0, started: 0, dish: null, label: null, target: null, batch: 1,
     stirs: 0, lastAttention: now(), ingredients: {}, log: [], follow: null, fired: new Set(), offSince: null }
 }
 
@@ -207,7 +208,7 @@ function snapshot(): Burner[] {
         next: steps.find((s) => !s.done && s.ingredient) ?? null }
     }
     return {
-      id: b.id, name: b.name, zone: b.zone, status,
+      id: b.id, name: b.name, zone: b.zone, status, source: b.source,
       flame: { on: flameOn, score: flameOn ? 0.8 + Math.random() * 0.15 : 0.02, manual: b.manual },
       motion: flameOn ? 0.02 : 0, steam: flameOn ? 0.55 + 0.2 * Math.sin(n + b.zone.x * 9) : 0.05,
       occupied: b.session ? 0.95 : 0.05, lid: 0, pending_follow: null,
@@ -328,6 +329,16 @@ export async function mockSend(method: string, path: string, body?: any): Promis
   }
   switch (`${method} ${path.split('?')[0]}`) {
     case 'POST /api/demo': reset(); return { demo: true }
+    case 'GET /api/lab/options': return labSamples.options
+    case 'POST /api/lab': {
+      // The real Lab runs in Python on your Mac; the preview shows precomputed results.
+      const src = body.source === 'lpg_small' ? 'lpg_large' : body.source
+      const mode = body.mode === 'evaluate' ? 'upgrade' : body.mode
+      const key = `${body.dish}:${body.dish === 'tadka' ? 'upgrade' : mode}:${src}` as keyof typeof labSamples.results
+      const r = labSamples.results[key] as any
+      if (!r) return fail('No precomputed example for that combination in the preview')
+      return body.mode === 'evaluate' ? { ...r.before, preview: true } : { ...r, preview: true }
+    }
     case 'GET /api/pantry': return mockPantry()
     case 'POST /api/profiles/active': active = body.id; emit(null, 'profile', `Cooking for ${prof().emoji} ${prof().name}`); return { active }
     case 'PUT /api/profiles': profiles = body.profiles; return mockPantry()

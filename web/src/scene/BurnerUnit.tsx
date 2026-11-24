@@ -37,6 +37,36 @@ function Grate({ r }: { r: number }) {
 
 export type SprinkleCue = { key: number; color: string }
 
+/** Induction zone: black glass with coil rings; glows red-orange under the pot when switched on. */
+function InductionPlate({ r, on }: { r: number; on: boolean }) {
+  const glow = useRef<THREE.MeshBasicMaterial>(null)
+  useFrame((st, dt) => {
+    const m = glow.current
+    if (!m) return
+    const k = on ? 0.75 + 0.2 * Math.sin(st.clock.elapsedTime * 2.4) : 0
+    m.opacity = THREE.MathUtils.lerp(m.opacity, k, Math.min(1, dt * 3))
+  })
+  return (
+    <group>
+      <mesh position-y={0.006} receiveShadow>
+        <cylinderGeometry args={[r * 1.05, r * 1.05, 0.01, 64]} />
+        <meshPhysicalMaterial color="#08080a" roughness={0.07} metalness={0.1} clearcoat={1} />
+      </mesh>
+      {[0.45, 0.72, 0.98].map((k) => (
+        <mesh key={k} rotation-x={-Math.PI / 2} position-y={0.0125}>
+          <ringGeometry args={[r * k - 0.01, r * k, 96]} />
+          <meshBasicMaterial color="#5a5e68" />
+        </mesh>
+      ))}
+      <mesh rotation-x={-Math.PI / 2} position-y={0.013}>
+        <ringGeometry args={[r * 0.9, r * 1.22, 96]} />
+        <meshBasicMaterial ref={glow} color={new THREE.Color('#ff5a1f').multiplyScalar(2.2)} transparent opacity={0}
+          toneMapped={false} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  )
+}
+
 export function BurnerUnit({ b, position, r, selected, onSelect, sprinkle }: {
   b: Burner
   sprinkle?: SprinkleCue
@@ -55,14 +85,16 @@ export function BurnerUnit({ b, position, r, selected, onSelect, sprinkle }: {
   const type = s?.vessel ?? 'pot'
   const R = r * 1.02
   const top = vesselTop(type, R)
-  const flameLevel = b.flame.on ? Math.max(0.55, Math.min(1, b.flame.score || 0.85)) : 0
+  const induction = b.source === 'induction'
+  const flameLevel = b.flame.on && !induction ? Math.max(0.55, Math.min(1, b.flame.score || 0.85)) : 0
   const cooking = b.flame.on && !!s
+  const seat = induction ? 0.015 : GRATE_Y + 0.03 // pots sit right on the glass
 
   // A gentle settle when the pot appears, and a subtle wobble while stirring.
   useFrame((st, dt) => {
     if (!vessel.current) return
     const g = vessel.current
-    const targetY = showVessel ? GRATE_Y + 0.03 : GRATE_Y + 1.2
+    const targetY = showVessel ? seat : seat + 1.2
     g.position.y = THREE.MathUtils.lerp(g.position.y, targetY, Math.min(1, dt * 5))
     const wobble = b.motion > 0.06 ? Math.sin(st.clock.elapsedTime * 14) * 0.02 : 0
     g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, wobble, Math.min(1, dt * 8))
@@ -80,6 +112,7 @@ export function BurnerUnit({ b, position, r, selected, onSelect, sprinkle }: {
         active={!!s || hover || selected}
         selected={selected || hover}
       />
+      {induction ? <InductionPlate r={r} on={b.flame.on} /> : <>
       {/* burner base + brass cap */}
       <mesh position-y={0.03} receiveShadow>
         <cylinderGeometry args={[r * 0.5, r * 0.56, 0.06, 40]} />
@@ -93,12 +126,13 @@ export function BurnerUnit({ b, position, r, selected, onSelect, sprinkle }: {
         <Flame radius={r * 0.43} level={flameLevel} />
       </group>
       <Grate r={r} />
-      <group ref={vessel} position-y={GRATE_Y + 1.2} scale={0.001}>
+      </>}
+      <group ref={vessel} position-y={seat + 1.2} scale={0.001}>
         <Vessel type={type} R={R} color={s?.color ?? '#c9a46a'} cooking={cooking} lid={b.lid > 0.5} steam={b.steam} />
         {type !== 'tawa' && <group position-y={top * 0.85}><Steam radius={R * 0.6} height={2.2} intensity={cooking ? Math.min(1, 0.25 + b.steam) : 0} /></group>}
       </group>
-      {sprinkle && <group position-y={GRATE_Y + top * 0.6}><Sprinkle trigger={sprinkle.key} color={sprinkle.color} radius={R} /></group>}
-      <group ref={anchor} position={frontRow ? [0, 0.05, r * 1.3] : [0, GRATE_Y + top + 0.55, 0]} />
+      {sprinkle && <group position-y={seat + top * 0.6}><Sprinkle trigger={sprinkle.key} color={sprinkle.color} radius={R} /></group>}
+      <group ref={anchor} position={frontRow ? [0, 0.05, r * 1.3] : [0, seat + top + 0.55, 0]} />
       {/* invisible hit target */}
       <mesh
         position-y={0.4}

@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-CHANNELS = ("salty", "sweet", "bitter", "sour", "umami", "heat", "fat")
+CHANNELS = ("salty", "sweet", "bitter", "sour", "umami", "heat", "fat", "astringent")
 
 # Hill parameters: half-max concentration K (units per channel) and Hill coefficient n.
 RECEPTORS: dict[str, tuple[float, float]] = {
@@ -42,10 +42,16 @@ RECEPTORS: dict[str, tuple[float, float]] = {
     "umami": (6.0, 1.0),     # mM glutamate
     "heat": (30.0, 1.0),     # µM capsaicin
     "fat": (60.0, 1.0),      # g/kg
+    "astringent": (900.0, 1.5),  # mg/L free tannin (tea polyphenols): a dry, rough feeling, not a taste bud
 }
 # How much each channel matters to overall liking, and how forgiving people are (σ in intensity units).
-WEIGHT = {"salty": 1.0, "sweet": 0.8, "bitter": 0.7, "sour": 0.5, "umami": 0.3, "heat": 0.8, "fat": 0.4}
-SIGMA = {"salty": 1.3, "sweet": 1.6, "bitter": 1.2, "sour": 2.0, "umami": 2.5, "heat": 1.9, "fat": 2.2}
+WEIGHT = {"salty": 1.0, "sweet": 0.8, "bitter": 0.7, "sour": 0.5, "umami": 0.3, "heat": 0.8, "fat": 0.4,
+          "astringent": 0.7}
+SIGMA = {"salty": 1.3, "sweet": 1.6, "bitter": 1.8, "sour": 2.0, "umami": 2.5, "heat": 1.9, "fat": 2.2,
+         "astringent": 2.0}
+# After swallowing, each sensation fades at its own pace (half-life in seconds). Sweet and salt go fast,
+# bitterness, dryness and chili burn linger: that lingering is the "aftertaste".
+HALF_LIFE = {"salty": 5, "sweet": 6, "sour": 6, "umami": 12, "fat": 20, "bitter": 30, "astringent": 45, "heat": 90}
 
 MW_NACL, MW_NAHCO3, MW_SUCROSE, MW_CAPSAICIN = 58.44, 84.0, 342.3, 305.4
 CHILI_CAPSAICIN_FRACTION = 0.0015   # ≈ 25 000 SHU red chili powder (SHU ≈ 16 × ppm capsaicin)
@@ -91,6 +97,7 @@ class Stimulus:
     umami: float = 0.0   # mM glutamate
     heat: float = 0.0    # µM capsaicin
     fat: float = 0.0     # g/kg (of total dish)
+    astringent: float = 0.0  # mg/L free tannin
 
     def scaled(self, k: float) -> "Stimulus":
         return Stimulus(**{c: getattr(self, c) * k for c in CHANNELS})
@@ -124,15 +131,18 @@ class Taster:
     sensitivity: dict[str, float] = field(default_factory=dict)
     ideal: dict[str, float] = field(default_factory=dict)     # ideal intensity 0-10 per channel
     bitter_type: str = "medium"                               # super / medium / non (PROP status)
+    ideal_after: dict[str, float] = field(default_factory=dict)  # lingering level they're used to
 
     def k(self, ch: str) -> float:
         return RECEPTORS[ch][0] * self.sensitivity.get(ch, 1.0)
 
 
-def perceive(t: Taster, s: Stimulus) -> dict[str, float]:
-    """Receptor responses -> mixture interactions -> perceived intensity 0-10."""
-    r = {ch: hill(getattr(s, ch), t.k(ch), RECEPTORS[ch][1]) for ch in CHANNELS}
+def perceive(t: Taster, s: Stimulus, after_s: float = 0.0) -> dict[str, float]:
+    """Receptor responses -> mixture interactions -> perceived intensity 0-10.
+    after_s > 0: what's left on the tongue that many seconds after swallowing."""
+    r = {ch: hill(getattr(s, ch), t.k(ch), RECEPTORS[ch][1]) * 0.5 ** (after_s / HALF_LIFE[ch]) for ch in CHANNELS}
     out = dict(r)
+    out["astringent"] = r["astringent"] * max(0.0, 1 - 0.2 * r["sweet"])            # sugar softens dryness a bit
     out["salty"] = min(1.0, r["salty"] * (1 + 0.2 * r["umami"]))                 # umami enhances salt
     out["bitter"] = r["bitter"] * max(0.0, 1 - 0.35 * r["sweet"] - 0.25 * r["salty"])  # sugar/salt mask bitter
     out["heat"] = r["heat"] * max(0.0, 1 - 0.25 * r["fat"] - 0.15 * r["sweet"])  # fat & sugar calm the burn
@@ -147,7 +157,7 @@ def liking(t: Taster, intensity: dict[str, float]) -> tuple[float, str | None, d
     for ch in CHANNELS:
         ideal = t.ideal.get(ch)
         i = intensity[ch]
-        if ch in ("bitter", "sour"):
+        if ch in ("bitter", "sour", "astringent"):
             # Nobody wants these for their own sake: only *more* than expected hurts.
             ceiling = max(1.5, ideal or 0.0)
             parts[ch] = 1.0 if i <= ceiling else math.exp(-((i - ceiling) ** 2) / (2 * SIGMA[ch] ** 2))
@@ -161,14 +171,14 @@ def liking(t: Taster, intensity: dict[str, float]) -> tuple[float, str | None, d
     geo = math.exp(sum(WEIGHT[c] * math.log(max(p, 1e-6)) for c, p in parts.items()) / wsum)
     worst = min(parts, key=parts.get)
     # Penalty analysis: the worst attribute ("too salty") dominates how much people like a dish.
-    score = 10 * geo * math.sqrt(parts[worst])
+    score = 10 * geo * parts[worst] ** 0.4
     complaint = None
     if parts[worst] < 0.75:
         hi = intensity[worst] > (t.ideal.get(worst) or 1.5)
         words = {"salty": ("too salty", "needs salt"), "sweet": ("too sweet", "not sweet enough"),
                  "bitter": ("bitter", "bitter"), "sour": ("too sour", "needs tang"),
                  "umami": ("too savoury", "flat"), "heat": ("too spicy", "too mild"),
-                 "fat": ("too oily", "dry")}[worst]
+                 "fat": ("too oily", "dry"), "astringent": ("dry, astringent", "dry, astringent")}[worst]
         complaint = words[0] if hi else words[1]
     return round(score, 1), complaint, {c: round(p, 3) for c, p in parts.items()}
 
@@ -179,9 +189,11 @@ def taster_for(name: str, ideal_stim: Stimulus, base: Taster | None = None) -> T
                bitter_type=base.bitter_type if base else "medium")
     ideal = perceive(t, ideal_stim)
     t.ideal = {ch: ideal[ch] for ch in ("salty", "sweet", "heat", "fat", "umami") if ideal[ch] > 0.05}
-    for ch in ("bitter", "sour"):          # the turmeric / lemon the recipe calls for is expected
+    for ch in ("bitter", "sour", "astringent"):   # the turmeric / lemon / tea the recipe calls for is expected
         if ideal[ch] > 0.05:
             t.ideal[ch] = ideal[ch]
+    after = perceive(t, ideal_stim, 30.0)
+    t.ideal_after = {ch: after[ch] for ch in ("bitter", "astringent")}
     return t
 
 
@@ -212,3 +224,27 @@ def panel_verdict(stim: Stimulus, ideal_stim: Stimulus, n: int = 40, seed: int =
             complaints[comp] = complaints.get(comp, 0) + 1
     return {"mean": round(float(np.mean(scores)), 2), "liked_%": round(100 * float(np.mean(np.array(scores) >= 7)), 1),
             "complaints": dict(sorted(complaints.items(), key=lambda kv: -kv[1]))}
+
+
+def aftertaste(t: Taster, s: Stimulus, after_s: float = 30.0) -> tuple[float, str | None, dict[str, float]]:
+    """How pleasant the finish is: lingering bitterness or dryness spoils it (0-1, complaint, what lingers).
+    Sweetness masks bitterness while sipping but fades first, so the bitterness shows up afterwards."""
+    left = perceive(t, s, after_s)
+    pen_b = math.exp(-max(0.0, left["bitter"] - max(1.0, t.ideal_after.get("bitter", 0) + 0.6)) ** 2 / (2 * 1.2 ** 2))
+    pen_a = math.exp(-max(0.0, left["astringent"] - max(1.2, t.ideal_after.get("astringent", 0) + 0.6)) ** 2
+                     / (2 * 1.4 ** 2))
+    f = pen_b * pen_a
+    complaint = None
+    if f < 0.8:
+        complaint = "bitter aftertaste" if pen_b <= pen_a else "dry, astringent aftertaste"
+    return round(f, 3), complaint, left
+
+
+def overall(t: Taster, s: Stimulus) -> dict:
+    """Sip + finish: the score people actually give after a few sips."""
+    sip = perceive(t, s)
+    score, complaint, _ = liking(t, sip)
+    f, after_complaint, left = aftertaste(t, s)
+    total = round(score * f ** 0.35, 1)
+    return {"score": total, "sip_score": score, "finish": f, "complaint": after_complaint if f < 0.8 and
+            (complaint is None or f < 0.6) else complaint, "sip": sip, "after": left}

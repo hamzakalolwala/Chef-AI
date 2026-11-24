@@ -29,7 +29,7 @@ export function LabelLayer({ burners }: { burners: Burner[] }) {
               ))}
               {s && (
                 <div className="tag-sub">
-                  {s.target_seconds ? `of ${minutes(s.target_seconds)}` : b.flame.on ? 'on the flame' : 'flame off'}
+                  {s.target_seconds ? `of ${minutes(s.target_seconds)}` : b.flame.on ? (b.source === 'induction' ? 'heating' : 'on the flame') : 'off'}
                   {b.status === 'danger' && ' · nothing on it!'}
                 </div>
               )}

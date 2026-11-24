@@ -87,6 +87,25 @@ sharpness. After ~4 s below 35% it shows **"lens fogged — wipe it"** (dashboar
 clears it holds each burner's last flame state, so the timers keep going, and pauses dish recognition
 and spoon counting. Brief steam puffs are ignored.
 
+## Recipe Lab and heat sources (LPG / induction)
+
+Recipe Lab fixes an old recipe ("my chai has a bitter, dry aftertaste") or creates a new one for the
+people you pick. It works for chai and dal tadka, on LPG or induction:
+
+- `heat.py` simulates the pot. On LPG, about a quarter of the flame's heat wraps the pot's sides and the
+  flame ring makes a hot spot. Induction puts about 85% of its power into the base only, pulses on/off
+  below about 800 W, and needs a steel or iron pot. Oil heats faster on induction and overshoots more easily.
+- `cookchem.py` handles extraction. Tea strength and caffeine come out fast; tannins come out slowly and keep
+  rising with long boiling, and milk protein binds some of them. Ginger and cardamom have their own rates.
+  Tadka spices release aroma as the oil heats and start burning (bitter) above about 190 °C.
+- The tongue now has astringency and an aftertaste (taste 30 s after swallowing). Each sensation fades at
+  its own rate, so sugar hides bitterness while sipping but the bitterness lingers after it.
+- `recipe_lab.py` cooks hundreds of versions in simulation, tastes each with every chosen person's tongue
+  and keeps the best. It returns the changes, steps with timings for your burner (flame words on LPG,
+  levels and watts on induction), and how the same recipe does on your other burners.
+
+Each burner has a type (Camera & zones). Induction shows no flame, so its timer starts when you tap **On**.
+
 ## Simulated tongue
 
 `backend/app/tongue.py` models how a person tastes the dish, so Sous Chef AI can say who will like it:
