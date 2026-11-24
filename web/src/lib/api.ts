@@ -29,6 +29,7 @@ async function send<T>(method: string, path: string, body?: unknown): Promise<T>
 }
 
 export const api = {
+  raw: <T = any>(method: string, path: string, body?: unknown) => send<T>(method, path, body),
   setOverride: (id: string, body: { dish_id: string | null; label: string | null; target_minutes: number | null; batch?: number | null }) =>
     send('POST', `/api/burners/${id}/override`, body),
   setFlame: (id: string, on: boolean | null) => send('POST', `/api/burners/${id}/flame`, { on }),

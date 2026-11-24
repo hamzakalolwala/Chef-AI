@@ -87,6 +87,29 @@ sharpness. After ~4 s below 35% it shows **"lens fogged — wipe it"** (dashboar
 clears it holds each burner's last flame state, so the timers keep going, and pauses dish recognition
 and spoon counting. Brief steam puffs are ignored.
 
+## Reference recipes, balance and cut size
+
+**Sister's recipes** in the top bar. Upload a sheet of recipes you love (`templates/reference_recipes_template.xlsx`,
+or any layout: one row per ingredient, one row per recipe, or a text column). From them Sous Chef AI learns:
+
+- **Your sweet spot**: what the simulated tongue reports for each recipe (sweet, bitter, sour, salty, rich), per
+  kind of dish (cake, cookie, dessert…).
+- **Balance** (`balance.py`): each ingredient's job. Structure comes from flour, eggs and cocoa; tenderness from
+  sugar, fat and leavening; moisture from milk, curd and egg water; drying from flour and starch. The ratios
+  between these jobs that make *her* recipes work become your ranges, with general defaults until there are enough.
+  Example: one extra cup of flour with the same 2 eggs is flagged "too dry / dense (cakey)".
+
+**Adapt to our taste** (`adapt.py`): paste a Pinterest/WhatsApp recipe or pick a YouTube one. The main dry
+ingredient stays fixed, and everything else moves *together* toward the sweet spot while staying inside the
+balance ranges. For example, less sugar also nudges milk and butter up, so the cake stays soft. The result shows
+every change, why it was made, and the new amounts in grams and cups.
+
+**Cut size** (`cuts.py`): small pieces have far more surface per gram. They cook through sooner, lose the fresh
+green aroma faster, brown more and pick up more oil. The advisor picks a size for a fresher or a more cooked taste
+and the cooking time you plan.
+
+Sheets you import are personal and stay out of git (`backend/data/reference/`).
+
 ## Recipe Lab and heat sources (LPG / induction)
 
 Recipe Lab fixes an old recipe ("my chai has a bitter, dry aftertaste") or creates a new one for the

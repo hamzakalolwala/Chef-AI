@@ -19,6 +19,7 @@ backend/data/profiles.json
 backend/data/videos/
 backend/data/samples/
 backend/data/eval/
+backend/data/reference/
 # local tooling
 .claude/
 *.log

@@ -442,6 +442,222 @@
         "cardamom",
         "elaichi"
       ]
+    },
+    {
+      "id": "egg",
+      "name": "Eggs",
+      "density": 1.03,
+      "marker": 34,
+      "color": "#f4e2b8",
+      "aliases": [
+        "eggs",
+        "egg",
+        "whole eggs",
+        "large eggs",
+        "anda",
+        "ande"
+      ]
+    },
+    {
+      "id": "yogurt",
+      "name": "Curd / yogurt",
+      "density": 1.05,
+      "marker": 35,
+      "color": "#f7f3ea",
+      "aliases": [
+        "curd",
+        "dahi",
+        "yogurt",
+        "yoghurt",
+        "greek yogurt",
+        "hung curd"
+      ]
+    },
+    {
+      "id": "buttermilk",
+      "name": "Buttermilk",
+      "density": 1.03,
+      "marker": 36,
+      "color": "#f3f1e8",
+      "aliases": [
+        "buttermilk",
+        "chaas",
+        "chhaas"
+      ]
+    },
+    {
+      "id": "condensed_milk",
+      "name": "Condensed milk",
+      "density": 1.3,
+      "marker": 37,
+      "color": "#f2dfb0",
+      "aliases": [
+        "condensed milk",
+        "sweetened condensed milk",
+        "milkmaid"
+      ]
+    },
+    {
+      "id": "chocolate",
+      "name": "Chocolate",
+      "density": 0.65,
+      "marker": 38,
+      "color": "#4a2a18",
+      "aliases": [
+        "dark chocolate",
+        "milk chocolate",
+        "chocolate",
+        "compound chocolate"
+      ]
+    },
+    {
+      "id": "cornflour",
+      "name": "Cornflour",
+      "density": 0.55,
+      "marker": 39,
+      "color": "#faf6ea",
+      "aliases": [
+        "cornflour",
+        "cornstarch",
+        "corn starch",
+        "corn flour"
+      ]
+    },
+    {
+      "id": "semolina",
+      "name": "Rava / semolina",
+      "density": 0.65,
+      "marker": 40,
+      "color": "#ecd9a4",
+      "aliases": [
+        "semolina",
+        "rava",
+        "sooji",
+        "suji"
+      ]
+    },
+    {
+      "id": "almond_flour",
+      "name": "Almond flour",
+      "density": 0.45,
+      "marker": 41,
+      "color": "#e3c9a0",
+      "aliases": [
+        "almond flour",
+        "almond meal",
+        "badam powder"
+      ]
+    },
+    {
+      "id": "jaggery",
+      "name": "Jaggery",
+      "density": 0.9,
+      "marker": 42,
+      "color": "#a8642a",
+      "aliases": [
+        "jaggery",
+        "gur",
+        "gud"
+      ]
+    },
+    {
+      "id": "lemon_juice",
+      "name": "Lemon juice",
+      "density": 1.03,
+      "marker": 43,
+      "color": "#f4ef7a",
+      "aliases": [
+        "lemon juice",
+        "lime juice",
+        "nimbu"
+      ]
+    },
+    {
+      "id": "milk_powder",
+      "name": "Milk powder",
+      "density": 0.5,
+      "marker": 44,
+      "color": "#f8f4e8",
+      "aliases": [
+        "milk powder",
+        "dry milk",
+        "powdered milk"
+      ]
+    },
+    {
+      "id": "capsicum",
+      "name": "Capsicum",
+      "density": 0.55,
+      "marker": 45,
+      "color": "#3f8f2c",
+      "aliases": [
+        "capsicum",
+        "bell pepper",
+        "bell peppers",
+        "shimla mirch",
+        "green pepper"
+      ]
+    },
+    {
+      "id": "onion",
+      "name": "Onion",
+      "density": 0.6,
+      "marker": 46,
+      "color": "#c8a2c8",
+      "aliases": [
+        "onion",
+        "onions",
+        "pyaz",
+        "pyaaz",
+        "kanda"
+      ]
+    },
+    {
+      "id": "tomato",
+      "name": "Tomato",
+      "density": 0.75,
+      "marker": 47,
+      "color": "#d23a2a",
+      "aliases": [
+        "tomato",
+        "tomatoes",
+        "tamatar"
+      ]
+    },
+    {
+      "id": "potato",
+      "name": "Potato",
+      "density": 0.65,
+      "marker": 48,
+      "color": "#d9c08a",
+      "aliases": [
+        "potato",
+        "potatoes",
+        "aloo"
+      ]
+    },
+    {
+      "id": "carrot",
+      "name": "Carrot",
+      "density": 0.55,
+      "marker": 49,
+      "color": "#ec8a2e",
+      "aliases": [
+        "carrot",
+        "carrots",
+        "gajar"
+      ]
+    },
+    {
+      "id": "paneer",
+      "name": "Paneer",
+      "density": 0.55,
+      "marker": null,
+      "color": "#f7f2e2",
+      "aliases": [
+        "paneer",
+        "cottage cheese"
+      ]
     }
   ],
   "spoons": [

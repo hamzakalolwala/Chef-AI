@@ -56,11 +56,13 @@ HALF_LIFE = {"salty": 5, "sweet": 6, "sour": 6, "umami": 12, "fat": 20, "bitter"
 MW_NACL, MW_NAHCO3, MW_SUCROSE, MW_CAPSAICIN = 58.44, 84.0, 342.3, 305.4
 CHILI_CAPSAICIN_FRACTION = 0.0015   # ≈ 25 000 SHU red chili powder (SHU ≈ 16 × ppm capsaicin)
 
-SWEETENERS = {"sugar": 1.0, "brown_sugar": 0.95, "honey": 0.8}           # sucrose-equivalent fraction
-BITTER = {"turmeric": 1.0, "kasuri_methi": 0.6, "cocoa": 0.5, "baking_soda": 1.5, "hing": 0.4}
-FATS = {"oil": 1.0, "ghee": 1.0, "butter": 0.82, "cream": 0.35, "milk": 0.035}
+SWEETENERS = {"sugar": 1.0, "brown_sugar": 0.95, "honey": 0.8, "jaggery": 0.8, "condensed_milk": 0.55,
+              "chocolate": 0.45, "chocolate_chips": 0.5}                          # sucrose-equivalent fraction
+BITTER = {"turmeric": 1.0, "kasuri_methi": 0.6, "cocoa": 0.5, "baking_soda": 1.5, "hing": 0.4, "chocolate": 0.15}
+FATS = {"oil": 1.0, "ghee": 1.0, "butter": 0.82, "cream": 0.35, "milk": 0.035, "egg": 0.10, "chocolate": 0.32,
+        "chocolate_chips": 0.30, "almond_flour": 0.5, "paneer": 0.25, "condensed_milk": 0.08, "yogurt": 0.035}
 # Titratable acid (mmol per g) for common sour ingredients, matched by name (custom items from videos).
-ACIDS = {"lemon": 0.26, "lime": 0.30, "tamarind": 0.6, "vinegar": 0.8, "amchur": 0.5, "curd": 0.09,
+ACIDS = {"lemon": 0.26, "lime": 0.30, "tamarind": 0.6, "vinegar": 0.8, "amchur": 0.5, "curd": 0.09, "buttermilk": 0.09,
          "yogurt": 0.09, "dahi": 0.09, "tomato": 0.035}
 # Free glutamate already in the dish (mM), plus glutamate-rich ingredients (mmol per g).
 DISH_UMAMI = {"curry": 3.5, "kheema": 3.0, "biryani": 2.5, "soup": 3.0, "dal": 1.5, "khichdi": 1.2,
@@ -107,7 +109,10 @@ def stimulus(grams: dict[str, float], mass_g: float, dish_id: str | None = None,
              names: dict[str, str] | None = None) -> Stimulus:
     """grams: ingredient id -> grams added. names: id -> display name (to spot 'lemon juice', 'tomato'…)."""
     mass = max(mass_g, 1.0)
-    water_l = mass * water_fraction(dish_id, grams) / 1000.0
+    wf = water_fraction(dish_id, grams)
+    # Dry foods (cake, cookies, roti) are dissolved by saliva while chewing: without this, a cake's sugar
+    # would saturate the sweet receptors and every cake would taste equally (maximally) sweet.
+    water_l = mass * (wf + (1.5 if wf < 0.5 else 0.0)) / 1000.0
     s = Stimulus()
     s.salty = (grams.get("salt", 0) / MW_NACL + grams.get("baking_soda", 0) / MW_NAHCO3) * 1000 / water_l
     s.sweet = sum(grams.get(i, 0) * f for i, f in SWEETENERS.items()) / MW_SUCROSE * 1000 / water_l

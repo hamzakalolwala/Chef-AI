@@ -28,6 +28,11 @@ from .dishes import load_catalog
 from .markers import SpoonTracker, marker_png
 from .pantry import Pantry
 from .recipe_lab import DISHES as LAB_DISHES, improve as lab_improve, options as lab_options
+from .adapt import adapt as adapt_recipe
+from .balance import grams_of
+from .cuts import VEG as CUT_VEG, advise as cut_advise, size_from_words
+from .reference import RefRecipe, fingerprint, guess_category, load_refs, parse_reference, save_refs, _item_from_text
+from .recipe_text import AliasMatcher
 from .video_recipe import fetch_recipe, list_recipes, load_recipe, save_recipe, video_id
 from .pipeline import FrameAnalysis, Pipeline
 from .storage import Storage
@@ -428,6 +433,27 @@ class LabIn(BaseModel):
     mode: str = Field(default="upgrade", pattern="^(upgrade|new|evaluate)$")
 
 
+class RefImportIn(BaseModel):
+    filename: str = Field(max_length=200)
+    data_b64: str = Field(max_length=14_000_000)       # ~10 MB file
+    replace: bool = False
+
+
+class AdaptIn(BaseModel):
+    text: str | None = Field(default=None, max_length=20000)     # pasted recipe (Pinterest, WhatsApp…)
+    video_id: str | None = None
+    reference_name: str | None = None
+    name: str = "Recipe"
+    category: str | None = None
+
+
+class CutIn(BaseModel):
+    veg: str = "capsicum"
+    want_fresh: float = Field(default=0.5, ge=0, le=1)
+    seconds: float = Field(default=240, gt=0, le=3600)
+    method: str = Field(default="stir_fry", pattern="^(stir_fry|saute|simmer|bake)$")
+
+
 class DismissIn(BaseModel):
     alert: str = Field(pattern="^(empty_flame|unattended|target)$")
 
@@ -608,6 +634,85 @@ async def lab(body: LabIn) -> dict:
     if "error" in res:
         raise HTTPException(409, res["error"])
     return res
+
+
+@app.get("/api/reference")
+def get_reference() -> dict:
+    refs = load_refs()
+    return {"recipes": [r.public() for r in refs], "fingerprint": fingerprint(refs, state.pantry) if refs else {}}
+
+
+@app.post("/api/reference/import")
+async def import_reference(body: RefImportIn) -> dict:
+    """Upload the reference recipe sheet (.xlsx / .csv) your taste should be learned from."""
+    import base64
+    try:
+        data = base64.b64decode(body.data_b64)
+        new = await asyncio.to_thread(parse_reference, data, body.filename, state.pantry)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        log.exception("reference import failed")
+        raise HTTPException(400, f"Couldn't read that sheet: {str(e)[:160]}")
+    if not new:
+        raise HTTPException(400, "Found no recipes with amounts in that sheet")
+    refs = new if body.replace else [r for r in load_refs() if r.name not in {n.name for n in new}] + new
+    save_refs(refs)
+    state.tracker.emit(None, "reference", f"Learned from {len(new)} reference recipes ({body.filename})", "success")
+    return {"imported": [r.public() for r in new], "fingerprint": fingerprint(refs, state.pantry)}
+
+
+@app.delete("/api/reference")
+async def clear_reference() -> dict:
+    save_refs([])
+    return {"ok": True}
+
+
+@app.post("/api/adapt")
+async def adapt_endpoint(body: AdaptIn) -> dict:
+    """Adapt a recipe to the reference sweet spot while keeping it balanced."""
+    if body.video_id:
+        r = load_recipe(body.video_id)
+        if r is None:
+            raise HTTPException(404, "read the video first")
+        items = [{"ingredient": i["ingredient"], "name": i["name"], "grams": i["grams"]} for i in r["items"]]
+        name = r["title"]
+    elif body.reference_name:
+        ref = next((x for x in load_refs() if x.name == body.reference_name), None)
+        if ref is None:
+            raise HTTPException(404, "unknown reference recipe")
+        items, name = ref.items, ref.name
+    elif body.text:
+        matcher = AliasMatcher(state.pantry.alias_map())
+        items = [it for line in body.text.splitlines() if (it := _item_from_text(line, matcher, state.pantry))]
+        name = body.name
+    else:
+        raise HTTPException(400, "give text, a video_id or a reference_name")
+    if not grams_of(items):
+        raise HTTPException(400, "No ingredient amounts found. Use lines like 'Sugar 1 cup' or 'Maida 200 g'")
+    category = body.category or guess_category(name)
+    refs = load_refs()
+    fp = fingerprint(refs, state.pantry) if refs else {}
+    cat_fp = fp.get(category) or (fp.get("sweet") if category != "savoury" else None)
+    ranges = {k: tuple(v) for k, v in cat_fp["ranges"].items()} if cat_fp and cat_fp.get("ranges") else None
+    res = await asyncio.to_thread(adapt_recipe, items, category, state.pantry,
+                                  cat_fp["taste"] if cat_fp else None, ranges)
+    if "error" in res:
+        raise HTTPException(400, res["error"])
+    cuts = []
+    for it in items:
+        if it.get("ingredient") in CUT_VEG:
+            size = size_from_words(it.get("raw") or it.get("name") or "")
+            cuts.append({"ingredient": it["ingredient"], "size_mm": size,
+                         **cut_advise(it["ingredient"], 0.5 if category == "savoury" else 0.3, 240)})
+    return {"name": name, "learned_from": cat_fp["recipes"] if cat_fp else [], **res, "cuts": cuts}
+
+
+@app.post("/api/cuts")
+def cuts(body: CutIn) -> dict:
+    if body.veg not in CUT_VEG:
+        raise HTTPException(400, f"know: {sorted(CUT_VEG)}")
+    return cut_advise(body.veg, body.want_fresh, body.seconds, body.method)
 
 
 @app.get("/api/pantry")

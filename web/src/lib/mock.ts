@@ -330,6 +330,11 @@ export async function mockSend(method: string, path: string, body?: any): Promis
   switch (`${method} ${path.split('?')[0]}`) {
     case 'POST /api/demo': reset(); return { demo: true }
     case 'GET /api/lab/options': return labSamples.options
+    case 'GET /api/reference': return { recipes: [], fingerprint: {} }
+    case 'POST /api/reference/import':
+    case 'POST /api/adapt':
+    case 'POST /api/cuts':
+      return fail('This runs on your Mac (Python): open the dashboard from the Sous Chef AI server to use it')
     case 'POST /api/lab': {
       // The real Lab runs in Python on your Mac; the preview shows precomputed results.
       const src = body.source === 'lpg_small' ? 'lpg_large' : body.source

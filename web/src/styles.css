@@ -340,3 +340,23 @@ button.fam { background: transparent; cursor: pointer; color: var(--muted); }
 .curve .before { stroke: #6d7180; }
 .curve .after { stroke: var(--saffron); }
 @media (max-width: 900px) { .lab, .lab-cols { grid-template-columns: 1fr; } }
+
+/* ---------- sister's recipes / taste library ---------- */
+.lib { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 18px; }
+.lib section { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.lib h4 { margin: 0; font: 600 14px 'Space Grotesk', Inter, sans-serif; }
+.lib textarea, .lib .lib-name, .lib select { background: rgba(0,0,0,0.35); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; color: var(--text); font: inherit; font-size: 13px; }
+.lib textarea { resize: vertical; }
+.btn.file { position: relative; overflow: hidden; display: inline-block; text-align: center; }
+.btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.spot-grid { display: grid; gap: 10px; }
+.spot { border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; display: grid; gap: 4px; }
+.spot b { text-transform: capitalize; }
+.spot-row { display: grid; grid-template-columns: 46px 1fr 62px; gap: 7px; align-items: center; font-size: 11.5px; color: var(--muted); }
+.spot-row .track { position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); }
+.spot-row .band { position: absolute; top: 0; bottom: 0; background: rgba(62,224,192,0.3); border-radius: 4px; }
+.spot-row i { position: absolute; top: -3px; width: 3px; height: 14px; background: var(--saffron); border-radius: 2px; }
+.spot-row i.was { background: #6d7180; }
+.spot-row em { font-style: normal; color: var(--text); font-variant-numeric: tabular-nums; text-align: right; }
+.adapt { display: grid; gap: 8px; }
+@media (max-width: 1000px) { .lib { grid-template-columns: 1fr; } }

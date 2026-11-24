@@ -11,10 +11,11 @@ import { LabelLayer } from './ui/LabelLayer'
 import { LabelsSheet, ProfileSwitcher, ProfilesEditor } from './ui/Profiles'
 import { FollowVideo } from './ui/FollowVideo'
 import { RecipeLab } from './ui/RecipeLab'
+import { TasteLibrary } from './ui/TasteLibrary'
 import type { SprinkleCue } from './scene/BurnerUnit'
 import { ConnectPhone, History } from './ui/Modals'
 
-type Panel = null | 'connect' | 'camera' | 'history' | 'profiles' | 'labels' | 'video' | 'lab'
+type Panel = null | 'connect' | 'camera' | 'history' | 'profiles' | 'labels' | 'video' | 'lab' | 'taste'
 
 const loadPref = (k: string, d: boolean) => {
   try {
@@ -99,6 +100,7 @@ export default function App() {
           <ProfileSwitcher pantry={pantry} activeId={state?.profile?.id} onEdit={() => setPanel('profiles')} />
           <button className="btn" onClick={() => setPanel('video')}>📺 Follow video</button>
           <button className="btn" onClick={() => setPanel('lab')}>🧪 Recipe Lab</button>
+          <button className="btn" onClick={() => setPanel('taste')}>🍰 Sister's recipes</button>
           <button className="btn" onClick={() => setPanel('connect')}>Connect phone</button>
           <button className="btn" onClick={() => setPanel('camera')}>Camera & zones</button>
           <button className="btn" onClick={() => setPanel('history')}>History</button>
@@ -163,6 +165,7 @@ export default function App() {
       {panel === 'history' && <History onClose={() => setPanel(null)} />}
       {panel === 'profiles' && pantry && <ProfilesEditor pantry={pantry} onSaved={setPantry} onClose={() => setPanel(null)} />}
       {panel === 'labels' && pantry && <LabelsSheet pantry={pantry} onClose={() => setPanel(null)} />}
+      {panel === 'taste' && <TasteLibrary onClose={() => setPanel(null)} />}
       {panel === 'lab' && pantry && <RecipeLab pantry={pantry} burners={burners} onClose={() => setPanel(null)} />}
       {panel === 'video' && pantry && <FollowVideo pantry={pantry} burners={burners} onClose={() => { setPanel(null); api.pantry().then(setPantry).catch(() => {}) }} />}
     </div>
