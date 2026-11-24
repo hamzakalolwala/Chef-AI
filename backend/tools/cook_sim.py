@@ -32,6 +32,7 @@ from app.markers import MarkerDetector, SpoonTracker  # noqa: E402
 from app.pantry import Pantry  # noqa: E402
 from app.taste import forecast  # noqa: E402
 from app.tracker import Tracker  # noqa: E402
+from app.tongue import panel_verdict, stimulus  # noqa: E402
 
 W, H = 640, 480
 FPS = 2.0   # overridden by --fps
@@ -243,6 +244,9 @@ def cook(dish: str, persona: Persona, seed: int, with_souschef: bool, pantry: Pa
                                 and x.t0 > tr.t0 else x for x in trips]
     mass = catalog.get(dish).mass_g * diluted
     taste = {r.taste: r for r in forecast(dict(true_g), recipe, mass)}
+    # 30 simulated people with varied tongues taste the finished dish (same panel with/without Sous Chef AI)
+    panel = panel_verdict(stimulus(dict(true_g), mass, dish), stimulus(recipe, catalog.get(dish).mass_g, dish),
+                          n=30, seed=seed)
     logged = tracker.burners["b1"].session.ingredients if tracker.burners["b1"].session else {}
     return {
         "dish": dish, "persona": persona.name, "with_souschef": with_souschef,
@@ -253,6 +257,7 @@ def cook(dish: str, persona: Persona, seed: int, with_souschef: bool, pantry: Pa
         "salty_level": taste["salty"].level if "salty" in taste else None,
         "sweet_level": taste["sweet"].level if "sweet" in taste else None,
         "beeps": Counter(e["kind"] for e in events),
+        "panel": panel,
         "limit_salt": recipe.get("salt", 0) * (1 + pantry.profile.tolerance),
     }
 
@@ -299,6 +304,10 @@ def report(pairs: list[tuple[dict, dict]]) -> dict:
         "salt_just_right_%_with": share([b["salty_level"] for _, b in salted], "ok"),
         "too_salty_%_without": share([a["salty_level"] for a, _ in salted], "high"),
         "too_salty_%_with": share([b["salty_level"] for _, b in salted], "high"),
+        "panel_liking_without": round(float(np.mean([a["panel"]["mean"] for a in no])), 2),
+        "panel_liking_with": round(float(np.mean([b["panel"]["mean"] for b in yes])), 2),
+        "panel_liked_%_without": round(float(np.mean([a["panel"]["liked_%"] for a in no])), 1),
+        "panel_liked_%_with": round(float(np.mean([b["panel"]["liked_%"] for b in yes])), 1),
     }
 
 

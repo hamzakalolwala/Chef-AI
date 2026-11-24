@@ -17,6 +17,7 @@ from typing import Callable
 from .dishes import EMPTY, EMPTY_VESSEL, LID, Catalog
 from .pantry import Pantry
 from .taste import forecast
+from .tongue import liking, perceive, stimulus, taster_for
 from .vision import Zone
 
 # Flame hysteresis
@@ -211,15 +212,15 @@ class Tracker:
             self.emit(b, "override", f"{b.name}: marked as {name}")
 
     # -- ingredients ----------------------------------------------------------------------
-    def ingredient_targets(self, s: Session) -> dict[str, float]:
+    def ingredient_targets(self, s: Session, profile=None) -> dict[str, float]:
         if not self.pantry:
             return {}
-        fallback = self.pantry.targets(self.dish_id(s), s.batch)
+        fallback = self.pantry.targets(self.dish_id(s), s.batch, profile)
         if not s.follow:
             return fallback
         # Following a video: its amounts × your batch scale × your profile. "To taste" items fall back
         # to your own recipe for this dish when there is one.
-        prof = self.pantry.profile
+        prof = profile or self.pantry.profile
         out: dict[str, float] = {}
         for it in s.follow["items"]:
             ing = it.get("ingredient")
@@ -488,6 +489,26 @@ class Tracker:
             return []
         return [r.public() for r in forecast(s.ingredients, self.ingredient_targets(s), self.dish_mass(s))]
 
+    def tongue(self, s: Session) -> dict | None:
+        """Simulated tongue: what's on it right now, and how each family profile would rate the dish."""
+        if not self.pantry or not (s.ingredients or s.follow):
+            return None
+        dish, mass = self.dish_id(s), self.dish_mass(s)
+        names = {i: self.pantry.ingredients[i].name for i in s.ingredients if i in self.pantry.ingredients}
+        now = stimulus(s.ingredients, mass, dish, names)
+        family = []
+        intensity = None
+        for p in self.pantry.profiles.values():
+            ideal = stimulus(self.ingredient_targets(s, p), mass, dish, names)
+            t = taster_for(p.name, ideal)
+            felt = perceive(t, now)
+            score, complaint, _ = liking(t, felt)
+            family.append({"id": p.id, "name": p.name, "emoji": p.emoji, "liking": score, "complaint": complaint,
+                           "active": p.id == self.pantry.active_profile})
+            if p.id == self.pantry.active_profile:
+                intensity = {"now": felt, "ideal": t.ideal}
+        return {"intensity": intensity, "family": family}
+
     def _ingredient_rows(self, s: Session) -> list[dict]:
         return _rows(self.pantry, self.ingredient_targets(s), s.ingredients) if self.pantry else []
 
@@ -542,6 +563,7 @@ class Tracker:
                     "ingredients": self._ingredient_rows(s),
                     "follow": self._follow_rows(s),
                     "taste": self.taste_forecast(s),
+                    "tongue": self.tongue(s),
                 },
             })
         return out

@@ -4,6 +4,7 @@ import { STATUS_LABEL, ago, clock, minutes, progressColor } from '../lib/format'
 import type { Burner, Dish, Pantry } from '../lib/types'
 import { IngredientPanel } from './Ingredients'
 import { FollowBadge } from './FollowVideo'
+import { TonguePanel } from './TonguePanel'
 
 function Editor({ b, dishes, onDone }: { b: Burner; dishes: Dish[]; onDone: () => void }) {
   const s = b.session
@@ -121,6 +122,7 @@ export function BurnerCard({ b, dishes, pantry, selected, onSelect }: {
 
       <FollowBadge b={b} />
       <IngredientPanel b={b} pantry={pantry} expanded={selected && !editing} />
+      <TonguePanel b={b} expanded={selected && !editing} />
 
       {b.status === 'danger' && (
         <div className="actions" onClick={(e) => e.stopPropagation()}>

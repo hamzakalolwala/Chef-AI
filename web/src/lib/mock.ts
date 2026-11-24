@@ -5,6 +5,7 @@
  */
 import dishesJson from '../../../backend/data/dishes.json'
 import pantryJson from '../../../backend/data/pantry.json'
+import { liking as tLiking, perceive, stimulus as tStim } from './tongue'
 import type { Burner, Dish, FollowState, KitchenEvent, KitchenState, Pantry, Profile, Status, VideoRecipe } from './types'
 
 export const MOCK = import.meta.env.VITE_MOCK === '1' || new URLSearchParams(location.search).get('mock') === '1'
@@ -87,8 +88,8 @@ function start(b: MB, dish: string | null, cookSeconds: number) {
   Object.assign(b, { lit: true, session: true, cook: cookSeconds, started: now() - cookSeconds, dish, lastAttention: now() })
 }
 
-function targets(b: MB): Record<string, number> {
-  const p = prof()
+function targets(b: MB, who?: Profile): Record<string, number> {
+  const p = who ?? prof()
   const f = (k: string) => p.multipliers[k] ?? 1
   const base: Record<string, number> = {}
   for (const [k, v] of Object.entries(RECIPES[b.dish ?? ''] ?? {})) base[k] = +(v * b.batch * f(k)).toFixed(2)
@@ -161,6 +162,22 @@ function taste(b: MB) {
   return rows
 }
 
+function tongue(b: MB) {
+  if (!Object.keys(b.ingredients).length) return null
+  const mass = b.follow
+    ? Math.max(300, b.follow.video.items.reduce((s, i) => s + (i.grams ?? 0), 0) * b.follow.scale)
+    : (dishOf(b)?.mass_g ?? 800) * b.batch
+  const now = perceive(tStim(b.ingredients, mass, b.dish))
+  let intensity = null
+  const family = profiles.map((p) => {
+    const ideal = perceive(tStim(targets(b, p), mass, b.dish))
+    const [score, complaint] = tLiking(now, ideal)
+    if (p.id === active) intensity = { now, ideal }
+    return { id: p.id, name: p.name, emoji: p.emoji, liking: score, complaint, active: p.id === active }
+  })
+  return { intensity, family }
+}
+
 function snapshot(): Burner[] {
   const n = now()
   return burners.map((b) => {
@@ -200,7 +217,7 @@ function snapshot(): Burner[] {
         dish_id: b.label ? null : b.dish, dish: dishName(b), vessel: d?.vessel ?? 'pot', color: d?.color ?? '#c9a46a',
         confidence: b.label ? 1 : 0.72, overridden: !!b.label, stirs: b.stirs, since_attention: n - b.lastAttention,
         flame_off_for: b.offSince ? n - b.offSince : null, alerts: [...b.fired], batch: b.batch,
-        ingredients: rows, follow, taste: taste(b),
+        ingredients: rows, follow, taste: taste(b), tongue: tongue(b),
       } : null,
     } as Burner
   })

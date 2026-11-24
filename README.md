@@ -87,6 +87,25 @@ sharpness. After ~4 s below 35% it shows **"lens fogged — wipe it"** (dashboar
 clears it holds each burner's last flame state, so the timers keep going, and pauses dish recognition
 and spoon counting. Brief steam puffs are ignored.
 
+## Simulated tongue
+
+`backend/app/tongue.py` models how a person tastes the dish, so Sous Chef AI can say who will like it:
+
+1. **Chemistry**: grams become concentrations in the dish's water (salt and sugar in mM, capsaicin in µM,
+   acids, glutamate, fat).
+2. **Receptors**: each taste channel follows the Beidler/Hill dose-response curve. The channels are
+   salty (ENaC), sweet (T1R2/T1R3), bitter (T2Rs), sour (OTOP1), umami (T1R1/T1R3), chili heat (TRPV1)
+   and fat (CD36).
+3. **Mixtures**: sugar and salt hide bitterness, umami boosts saltiness, and fat and sugar calm chili heat.
+4. **Liking**: each person has a "bliss point" per taste. The worst taste dominates the overall score,
+   as penalty analysis in sensory science finds.
+5. **People differ**: receptor sensitivity varies. About 25% are bitter super-tasters and 25% non-tasters.
+   Chili tolerance varies too.
+
+Burner cards show the live taste bars and a predicted score for each family profile.
+`tools/cook_sim.py` uses a 30-person virtual panel to score finished dishes. Parameters are approximate
+literature values: it's a principled simulation, not a measurement.
+
 ## How it works
 
 | Signal | How | Where |

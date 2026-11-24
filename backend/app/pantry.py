@@ -97,9 +97,9 @@ class Pantry:
         f = self.profile.fill if fill is None else fill
         return round(count * sp.ml * ing.density * f, 2)
 
-    def targets(self, dish_id: str | None, batch: float = 1.0) -> dict[str, float]:
+    def targets(self, dish_id: str | None, batch: float = 1.0, profile: "Profile | None" = None) -> dict[str, float]:
         recipe = self.recipes.get(dish_id or "", {})
-        p = self.profile
+        p = profile or self.profile
         return {k: round(v * batch * p.factor(k), 2) for k, v in recipe.items() if k in self.ingredients}
 
     # -- profiles -------------------------------------------------------------------------

@@ -22,6 +22,13 @@ export type Session = {
   batch: number
   ingredients: IngredientRow[]
   follow: FollowState | null
+  tongue?: Tongue | null
+}
+
+export type TasteChannel = 'salty' | 'sweet' | 'bitter' | 'sour' | 'umami' | 'heat' | 'fat'
+export type Tongue = {
+  intensity: { now: Record<TasteChannel, number>; ideal: Partial<Record<TasteChannel, number>> } | null
+  family: { id: string; name: string; emoji: string; liking: number; complaint: string | null; active: boolean }[]
 }
 
 export type FollowStep = {
